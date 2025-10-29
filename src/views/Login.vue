@@ -40,7 +40,7 @@
             />
           </div>
 
-          <button type="submit" class="btn w-100 text-white fw-semibold" style="background-color: #1B4079;">
+          <button type="submit" class="btn w-100 text-white fw-semibold" @click="goToDashboard" style="background-color: #1B4079;">
             Iniciar sesión
           </button>
         </form>
@@ -84,6 +84,9 @@ export default {
     },
     goToWelcome() {
       this.$router.push("/")
+    },
+    goToDashboard() {
+      this.$router.push("/dashboard")
     }
   }
 }
