@@ -1,6 +1,6 @@
 <template>
   <div class="login-page">
-    
+
     <nav class="navbar navbar-expand-lg shadow-sm py-3" style="background-color: #1B4079;">
       <div class="container">
         <a class="navbar-brand d-flex align-items-center text-white fw-bold" @click="goToWelcome" href="#">
@@ -10,7 +10,7 @@
       </div>
     </nav>
 
-    
+
     <section class="login-section d-flex align-items-center justify-content-center">
       <div class="card shadow-lg border-0 p-4" style="max-width: 450px; width: 100%; background-color: #ffffffd8;">
         <h2 class="text-center fw-bold mb-4" style="color: #1B4079;">Iniciar sesión</h2>
@@ -40,19 +40,25 @@
             />
           </div>
 
-          <button type="submit" class="btn w-100 text-white fw-semibold" @click="goToDashboard" style="background-color: #1B4079;">
+          <button type="submit" class="btn w-100 text-white fw-semibold" style="background-color: #1B4079;">
             Iniciar sesión
           </button>
         </form>
 
         <p class="text-center mt-4 mb-0 text-muted">
           ¿No tienes cuenta?
-          <a href="#" class="fw-semibold" style="color: #4D7C8A;" @click.prevent="goToRegister">Regístrate aquí</a>
+          <a href="#" class="fw-semibold" style="color: #4D7C8A;" @click.prevent="goToRegister">
+            Regístrate aquí
+          </a>
         </p>
+
+        <div v-if="error" class="alert alert-danger mt-3 text-center">
+          {{ error }}
+        </div>
       </div>
     </section>
 
-   
+    <!-- FOOTER -->
     <footer class="text-center py-3 mt-5" style="background-color: #1B4079; color: white;">
       <small>© 2025 Cloud Platform — Todos los derechos reservados.</small>
     </footer>
@@ -60,36 +66,55 @@
 </template>
 
 <script>
+import { loginUser } from "@/api/userApi"; // 👈 usa la API real
+
 export default {
-  name: "Login",    
+  name: "Login",
   data() {
     return {
       correo: "",
-      password: ""
-    }
+      password: "",
+      error: null
+    };
   },
   methods: {
-    loginUser() {
+    async loginUser() {
+      this.error = null;
+
       if (!this.correo || !this.password) {
-        alert("Por favor, complete todos los campos.")
-        return
+        this.error = "Por favor, complete todos los campos.";
+        return;
       }
 
-     
-      console.log("Intentando iniciar sesión con:", this.correo)
-      alert("Inicio de sesión simulado con éxito.")
+      try {
+        const credentials = {
+          correo: this.correo,
+          contraseña: this.password // 👈 coincide con el DTO del backend
+        };
+
+        const data = await loginUser(credentials);
+        console.log("Respuesta del backend:", data);
+
+        
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+        }
+
+        
+        this.$router.push("/dashboard");
+      } catch (err) {
+        this.error = err.message || "Error al iniciar sesión.";
+      }
     },
+
     goToRegister() {
-      this.$router.push("/register")
+      this.$router.push("/register");
     },
     goToWelcome() {
-      this.$router.push("/")
-    },
-    goToDashboard() {
-      this.$router.push("/dashboard")
+      this.$router.push("/");
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -104,7 +129,6 @@ export default {
   flex-grow: 1;
 }
 
-
 .form-control {
   border-radius: 8px;
   border: 1px solid #b7c9cc;
@@ -113,7 +137,6 @@ export default {
   box-shadow: 0 0 0 0.2rem rgba(27, 64, 121, 0.25);
   border-color: #1B4079;
 }
-
 
 .btn:hover {
   background-color: #4D7C8A !important;

@@ -15,3 +15,15 @@ export const registerUser = async (userData) => {
     throw new Error("Error desconocido al registrar usuario");
   }
 };
+
+export const loginUser = async (credentials) => {
+  try {
+    const response = await axios.post(`${API_URL}/login`, credentials);
+    return response.data; // normalmente trae el token o datos del usuario
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.message) {
+      throw new Error(error.response.data.message);
+    }
+    throw new Error("Error al iniciar sesión");
+  }
+};
