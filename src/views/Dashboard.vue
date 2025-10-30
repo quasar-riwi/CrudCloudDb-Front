@@ -3,22 +3,24 @@
     <!-- Menú lateral -->
     <aside class="sidebar">
       <div class="logo">
-        <h2>CCD</h2>
-        <p>Platform</p>
+        <a class="navbar-brand d-flex align-items-center justify-content-center text-white fw-bold" @click="goToDashboard" href="#">
+          <img src="@/assets/logo.png" alt="Logo" height="60"  /> 
+        </a>
+
       </div>
 
-      <nav class="menu">
-        <button @click="$router.push('/dashboard/home')" >
+      <nav class="  menu">
+        <button class="txtSize" @click="$router.push('/dashboard/home')" >
           🏠 Inicio
         </button>
-        <button @click="$router.push('/dashboard/database')" >
+        <button class="txtSize" @click="$router.push('/dashboard/database')" >
           💾 Mis Bases de Datos
         </button>
-        <button>
+        <button class="txtSize">
           💳 Planes y Suscripciones
         </button>
         
-        <button>
+        <button class="txtSize">
           ⚙️ Configuración
         </button>
       </nav>
@@ -44,10 +46,19 @@
 <script>
 export default {
   name: "Dashboard",
+  methods: {
+    goToDashboard() {
+      this.$router.push('/dashboard/home');
+    },
+  },
 };
+
+ 
 </script>
 
 <style scoped>
+
+
 .dashboard {
   display: flex;
   height: 100vh;
@@ -86,7 +97,7 @@ export default {
 .menu {
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: 10px;
   gap: 12px;
 }
 

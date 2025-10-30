@@ -10,7 +10,6 @@
     </nav>
 
     <section class="register-section d-flex align-items-center justify-content-center">
-      <!-- Mostrar formulario o verificación -->
       <div v-if="!showVerification" class="card shadow-lg border-0 p-4" style="max-width: 450px; width: 100%; background-color: #ffffffd8;">
         <h2 class="text-center fw-bold mb-4" style="color: #1B4079;">Crear cuenta</h2>
 
@@ -50,13 +49,6 @@
           <a href="#" class="fw-semibold" style="color: #4D7C8A;" @click.prevent="goToLogin">Inicia sesión</a>
         </p>
       </div>
-
-      <!-- Componente de verificación -->
-      <VerificationCode
-        v-else
-        :email="correo"
-        @verified="handleVerified"
-      />
     </section>
 
     <footer class="text-center py-3 mt-5" style="background-color: #1B4079; color: white;">
@@ -66,11 +58,12 @@
 </template>
 
 <script>
-import VerificationCode from "@/components/VerificationCode.vue";
+import axios from "axios";
+
+const API_URL = "http://localhost:5005/api/Users/register";
 
 export default {
   name: "Register",
-  components: { VerificationCode },
   data() {
     return {
       nombre: "",
@@ -82,19 +75,33 @@ export default {
     };
   },
   methods: {
-    registerUser() {
+    async registerUser() {
       if (this.password !== this.confirmPassword) {
         alert("Las contraseñas no coinciden.");
         return;
       }
 
-      console.log("Registrando usuario:", this.nombre, this.apellido, this.correo);
-      alert("Te hemos enviado un código de verificación a tu correo (simulado).");
-      this.showVerification = true;
-    },
-    handleVerified() {
-      alert("Tu cuenta ha sido verificada correctamente (simulado).");
-      this.$router.push("/login");
+      try {
+        const response = await axios.post(API_URL, {
+          nombre: this.nombre,
+          apellido: this.apellido,
+          correo: this.correo,
+          contraseña: this.password,
+          confirmarContraseña: this.confirmPassword,
+          plan: "Gratis"
+        });
+
+       
+        alert("Usuario registrado correctamente.");
+        this.$router.push("/login");
+      } catch (error) {
+        
+        if (error.response && error.response.data && error.response.data.message) {
+          alert("Error al registrar el usuario: " + error.response.data.message);
+        } else {
+          alert("Error al registrar el usuario. Por favor, inténtelo de nuevo más tarde.");
+        }
+      }
     },
     goToLogin() {
       this.$router.push("/login");
