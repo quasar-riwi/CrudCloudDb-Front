@@ -1,92 +1,79 @@
 <template>
-  <div class="verification-wrapper d-flex justify-content-center align-items-center">
-    <div class="card shadow-lg p-4 border-0" style="max-width: 400px; width: 100%; background-color: #ffffffd8;">
-      <h4 class="text-center fw-bold mb-3" style="color: #1B4079;">
-        Verificación de código
-      </h4>
+  <div class="d-flex align-items-center justify-content-center vh-100 bg-light">
+    <div class="card shadow p-4 text-center" style="max-width: 420px; width: 100%;">
+      <div v-if="loading">
+        <div class="spinner-border text-primary mb-3" role="status"></div>
+        <h5>Verificando tu cuenta...</h5>
+        <p class="text-muted small">Por favor espera un momento.</p>
+      </div>
 
-      <p class="text-center mb-4 text-muted">
-        Hemos enviado un código de verificación a <strong>{{ email }}</strong>.
-      </p>
-
-      <input v-model="code" type="text"
-        maxlength="6" class="form-control text-center fw-bold mb-3" placeholder="Ingresa el código" style="font-size: 1.5rem; letter-spacing: 4px;"/>
-
-      <button class="btn w-100 text-white fw-semibold mb-3" style="background-color: #1B4079;" @click="verifyCode"
-        :disabled="loading">
-        {{ loading ? "Verificando..." : "Confirmar código" }}
-      </button>
-
-      <div class="text-center">
-        <button class="btn btn-link p-0" @click="resendCode" :disabled="cooldown > 0" style="color: #4D7C8A;">
-          {{ cooldown > 0 ? `Reenviar código en ${cooldown}s` : "Reenviar código" }}
+      <div v-else-if="success">
+        <i class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+        <h5>¡Cuenta verificada exitosamente!</h5>
+        <p class="text-muted small">
+          Ya puedes acceder a tu cuenta y comenzar a usar la plataforma.
+        </p>
+        <button class="btn btn-success w-100 mt-3" @click="goToDashboard">
+          Ir al Dashboard
         </button>
+      </div>
+
+      <div v-else>
+        <i class="bi bi-x-circle-fill text-danger fs-1 mb-3"></i>
+        <h5>Hubo un problema</h5>
+        <p class="text-muted small">{{ errorMessage }}</p>
+        <router-link to="/login" class="btn btn-outline-primary w-100 mt-3">
+          Volver al inicio de sesión
+        </router-link>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onUnmounted } from "vue";
+import { ref, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { verifyEmail } from "@/api/userApi";
 
-const props = defineProps({
-  email: { type: String, required: true },
-  type: { type: String, default: "register" }  
-});
+const route = useRoute();
+const router = useRouter();
 
-const emit = defineEmits(["verified"]);
+const loading = ref(true);
+const success = ref(false);
+const errorMessage = ref("");
 
-const code = ref("");
-const loading = ref(false);
-const cooldown = ref(0);
-let timer = null;
+onMounted(async () => {
+  const token = route.query.token;
 
-// Verify code
-const verifyCode = async () => {
-  loading.value = true;
+  if (!token) {
+    loading.value = false;
+    errorMessage.value = "Token de verificación no encontrado.";
+    return;
+  }
 
   try {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Example verification logic
-    if (code.value === "123456") {
-      alert(" Código verificado correctamente");
-      emit("verified", true);
-    } else {
-      alert(" Código incorrecto");
-      emit("verified", false);
-    }
+    const response = await verifyEmail(token);
+    console.log(response);
+    success.value = true;
+  } catch (error) {
+    errorMessage.value = error.message || "Error al verificar el correo.";
   } finally {
     loading.value = false;
   }
+});
+
+const goToDashboard = () => {
+  router.push("/dashboard");
 };
-
-
-const resendCode = async () => {
-  alert(`Código reenviado a ${props.email}`);
-  startCooldown();
-};
-
-
-const startCooldown = () => {
-  cooldown.value = 30;
-  clearInterval(timer);
-  timer = setInterval(() => {
-    if (cooldown.value > 0) cooldown.value--;
-    else clearInterval(timer);
-  }, 1000);
-};
-
-onUnmounted(() => clearInterval(timer));
 </script>
 
 <style scoped>
-.verification-wrapper {
-  min-height: 100vh;
- 
-}
 .card {
-  border-radius: 16px;
+  border-radius: 1rem;
+  background-color: #ffffff;
+}
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
 }
 </style>

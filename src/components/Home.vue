@@ -1,12 +1,12 @@
 <template>
   <div class="home-dashboard">
-    <!-- Encabezado -->
+
     <header class="header">
       <h2>👋 Bienvenido, Juan José</h2>
       <p>Este es tu panel principal de <strong>CrudCloudDb Platform</strong>.</p>
     </header>
 
-    <!-- Tarjetas de estadísticas -->
+
     <section class="stats-grid">
       <div class="stat-card">
         <h6>Plan Actual</h6>
@@ -32,7 +32,7 @@
       </div>
     </section>
 
-    <!-- Motores -->
+
     <section class="engines">
       <h4>Tus motores disponibles</h4>
       <div class="engine-grid">
@@ -56,7 +56,6 @@
       </div>
     </section>
 
-    <!-- CTA -->
     <div class="cta">
       <button class="btn-main">
         + Crear Nueva Base de Datos
@@ -66,7 +65,7 @@
 </template>
 
 <style scoped>
-/* 🎨 Paleta base CCD */
+
 :root {
   --primary: #3B82F6; /* azul tech cloud */
   --secondary: #1E293B; /* azul grisáceo oscuro */

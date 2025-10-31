@@ -29,7 +29,7 @@ const routes = [
     component: Dashboard, 
     children: [
       {
-        path: '', // redirección al entrar a /dashboard
+        path: '/dashboard', // redirección al entrar a /dashboard
         redirect: '/dashboard/home',
       },
       {
