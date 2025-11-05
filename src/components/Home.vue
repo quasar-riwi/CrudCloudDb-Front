@@ -2,7 +2,7 @@
   <div class="home-dashboard">
 
     <header class="header">
-      <h2>👋 Bienvenido, Juan José</h2>
+      <h2>👋 {{ user ? user.nombre : 'Cargando...' }}</h2>
       <p>Este es tu panel principal de <strong>CrudCloudDb Platform</strong>.</p>
     </header>
 
@@ -63,6 +63,15 @@
     </div>
   </div>
 </template>
+
+<script>
+export default {
+  name: "Home",
+  props: {
+    user: Object
+  }
+};
+</script>
 
 <style scoped>
 

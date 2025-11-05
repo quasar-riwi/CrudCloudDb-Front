@@ -1,69 +1,107 @@
 <template>
   <div class="dashboard">
-
     <aside class="sidebar">
       <div class="logo">
         <a class="navbar-brand d-flex align-items-center justify-content-center text-white fw-bold" @click="goToDashboard" href="#">
-          <img src="@/assets/logo.png" alt="Logo" height="60"  /> 
+          <img src="@/assets/logo.png" alt="Logo" height="60" /> 
         </a>
-
       </div>
 
-      <nav class="  menu">
-        <button class="txtSize" @click="$router.push('/dashboard/home')" >
-          🏠 Inicio
-        </button>
-        <button class="txtSize" @click="$router.push('/dashboard/database')" >
-          💾 Mis Bases de Datos
-        </button>
-        <button class="txtSize">
-          💳 Planes y Suscripciones
-        </button>
-        
-        <button class="txtSize">
-          ⚙️ Configuración
-        </button>
+      <nav class="menu">
+        <button class="txtSize" @click="$router.push('/dashboard/home')">🏠 Inicio</button>
+        <button class="txtSize" @click="$router.push('/dashboard/database')">💾 Mis Bases de Datos</button>
+        <button class="txtSize">💳 Planes y Suscripciones</button>
+        <button class="txtSize">⚙️ Configuración</button>
       </nav>
 
       <div class="user-section">
         <div class="user-icon">👤</div>
         <div class="user-info">
-          <p class="user-name">Juan José Hernández</p>
-          <p class="user-plan">Plan: Gratuito</p>
-          <a class="btn btn-danger" @click="logout" >cerrar sesion</a>
+          <p class="user-name">{{ user ? user.nombre : 'Cargando...' }}</p>
+          <p class="user-plan">Plan: {{ user ? user.plan : 'Cargando...' }}</p>
+          <a class="btn btn-danger" @click="logout">Cerrar sesión</a>
         </div>
       </div>
     </aside>
 
-    
-        <main class="content">
-            <section class="main-content">
-                <router-view />
-            </section>
-        </main>
+    <main class="content">
+      <section class="main-content">
+        <router-view :user="user" />
+      </section>
+    </main>
   </div>
+  
 </template>
 
 <script>
+import axios from "axios";
+import * as jwtDecode from "jwt-decode"; // ✅ así como dijiste que te funciona
+
+const API_URL = "http://localhost:5005/api/Users";
+
 export default {
   name: "Dashboard",
+  data() {
+    return {
+      user: null,
+      error: ""
+    };
+  },
+  async created() {
+    await this.getUserInfo();
+  },
   methods: {
+    async getUserInfo() {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          this.error = "No hay token. Inicia sesión.";
+          this.$router.push("/login");
+          return;
+        }
+
+        // ✅ Decodificar token para obtener ID
+        const decoded = jwtDecode.jwtDecode(token);
+        console.log("Token decodificado:", decoded);
+
+        const userId =
+          decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+
+        if (!userId) {
+          this.error = "No se pudo obtener el ID del usuario desde el token.";
+          console.error(this.error);
+          return;
+        }
+
+        // ✅ Llamar al backend con el token
+        const response = await axios.get(`${API_URL}/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        this.user = response.data.data;
+        console.log("Usuario cargado:", this.user);
+        console.log("🧾 Datos del usuario recibidos:", response.data);
+
+
+      } catch (error) {
+        console.error("Error al obtener los datos del usuario:", error);
+        this.error = "Error al obtener los datos del usuario.";
+      }
+      
+    },
     goToDashboard() {
-      this.$router.push('/dashboard/home');
+      this.$router.push("/dashboard/home");
     },
     logout() {
       localStorage.removeItem("token");
       this.$router.push("/login");
-      }
-  },
+    }
+  }
+  
 };
-
- 
 </script>
 
 <style scoped>
-
-
 .dashboard {
   display: flex;
   height: 100vh;
@@ -74,7 +112,7 @@ export default {
 
 .sidebar {
   width: 250px;
-  background-color: #2a2a3d; 
+  background-color: #2a2a3d;
   color: white;
   display: flex;
   flex-direction: column;
@@ -85,17 +123,6 @@ export default {
 .logo {
   text-align: center;
   color: #fff;
-}
-
-.logo h2 {
-  margin: 0;
-  font-size: 1.8rem;
-  color: #007bff;
-}
-
-.logo p {
-  font-size: 0.9rem;
-  color: #bbb;
 }
 
 
@@ -123,7 +150,7 @@ export default {
   color: white;
 }
 
-/* Usuario abajo */
+
 .user-section {
   display: flex;
   align-items: center;
@@ -158,23 +185,16 @@ export default {
   flex-direction: column;
 }
 
-.header {
-  background-color: white;
-  padding: 16px 30px;
-  border-bottom: 1px solid #ddd;
-}
-
 .main-content {
   padding: 30px;
 }
 
-.main-content h2 {
-  color: #333;
-  margin-bottom: 10px;
+.welcome-message h2 {
+  color: #1b4079;
+  font-weight: bold;
 }
 
-.main-content p {
-  color: #555;
-  line-height: 1.5;
+.alert {
+  margin-top: 10px;
 }
 </style>

@@ -42,16 +42,19 @@ const routes = [
       {
         path: '/dashboard', 
         redirect: '/dashboard/home',
+        props: true,
       },
       {
         path: 'home', 
         name: 'DashboardHome',
         component: Home,
+        props: true,
       },
       {
         path: 'database', 
         name: 'Dashboard/Database',
         component: DataBases,
+        props: true,
       },
       
     ],

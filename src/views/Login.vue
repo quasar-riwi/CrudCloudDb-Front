@@ -103,7 +103,7 @@ export default {
 
         
         if (data.user && !data.user.EmailVerified) {
-          this.$router.push("/verify-notice"); // 👉 Redirige si el correo no está verificado
+          this.$router.push("/verify-notice"); 
         } else {
           this.$router.push("/dashboard");
         }
