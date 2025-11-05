@@ -7,7 +7,7 @@ import Home from '../components/Home.vue' //
 import DataBases from '@/components/DataBases.vue'
 
 const routes = [
-  // Página de bienvenida
+
   { 
     path: '/', 
     name: 'Welcome', 
@@ -23,13 +23,23 @@ const routes = [
     name: 'Register', 
     component: () => import('../views/Register.vue') 
   },
+
+  {
+  path: '/verify-email',
+  name: 'VerifyEmail',
+  component: () => import('@/views/EmailVerification.vue')
+},
+
+
+
+
   {
     path: '/dashboard',
     name: 'Dashboard',
     component: Dashboard, 
     children: [
       {
-        path: '/dashboard', // redirección al entrar a /dashboard
+        path: '/dashboard', 
         redirect: '/dashboard/home',
       },
       {

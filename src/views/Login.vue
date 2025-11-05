@@ -10,7 +10,6 @@
       </div>
     </nav>
 
-
     <section class="login-section d-flex align-items-center justify-content-center">
       <div class="card shadow-lg border-0 p-4" style="max-width: 450px; width: 100%; background-color: #ffffffd8;">
         <h2 class="text-center fw-bold mb-4" style="color: #1B4079;">Iniciar sesión</h2>
@@ -58,7 +57,6 @@
       </div>
     </section>
 
-    <!-- FOOTER -->
     <footer class="text-center py-3 mt-5" style="background-color: #1B4079; color: white;">
       <small>© 2025 Cloud Platform — Todos los derechos reservados.</small>
     </footer>
@@ -66,7 +64,7 @@
 </template>
 
 <script>
-import { loginUser } from "@/api/userApi"; // 👈 usa la API real
+import { loginUser } from "@/api/userApi";
 
 export default {
   name: "Login",
@@ -89,21 +87,29 @@ export default {
       try {
         const credentials = {
           correo: this.correo,
-          contraseña: this.password // 👈 coincide con el DTO del backend
+          contraseña: this.password
         };
 
         const data = await loginUser(credentials);
         console.log("Respuesta del backend:", data);
 
-        
+   
         if (data.token) {
           localStorage.setItem("token", data.token);
         }
+        if (data.user) {
+          localStorage.setItem("user", JSON.stringify(data.user));
+        }
 
         
-        this.$router.push("/dashboard");
+        if (data.user && !data.user.EmailVerified) {
+          this.$router.push("/verify-notice"); // 👉 Redirige si el correo no está verificado
+        } else {
+          this.$router.push("/dashboard");
+        }
+
       } catch (err) {
-        this.error = err.message || "Error al iniciar sesión.";
+        this.error = err.response?.data?.message || err.message || "Error al iniciar sesión.";
       }
     },
 
