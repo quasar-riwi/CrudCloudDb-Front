@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard">
-    <!-- Menú lateral -->
+
     <aside class="sidebar">
       <div class="logo">
         <a class="navbar-brand d-flex align-items-center justify-content-center text-white fw-bold" @click="goToDashboard" href="#">
@@ -30,6 +30,7 @@
         <div class="user-info">
           <p class="user-name">Juan José Hernández</p>
           <p class="user-plan">Plan: Gratuito</p>
+          <a class="btn btn-danger" @click="logout" >cerrar sesion</a>
         </div>
       </div>
     </aside>
@@ -50,6 +51,10 @@ export default {
     goToDashboard() {
       this.$router.push('/dashboard/home');
     },
+    logout() {
+      localStorage.removeItem("token");
+      this.$router.push("/login");
+      }
   },
 };
 
@@ -66,10 +71,10 @@ export default {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Sidebar */
+
 .sidebar {
   width: 250px;
-  background-color: #2a2a3d; /* más claro que antes */
+  background-color: #2a2a3d; 
   color: white;
   display: flex;
   flex-direction: column;
@@ -93,7 +98,7 @@ export default {
   color: #bbb;
 }
 
-/* Menú */
+
 .menu {
   display: flex;
   flex-direction: column;

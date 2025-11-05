@@ -44,6 +44,14 @@
           </button>
         </form>
 
+        <div v-if="error" class="alert alert-danger mt-3 text-center">
+          {{ error }}
+        </div>
+
+        <div v-if="success" class="alert alert-success mt-3 text-center">
+          {{ success }}
+        </div>
+
         <p class="text-center mt-4 mb-0 text-muted">
           ¿Ya tienes una cuenta?
           <a href="#" class="fw-semibold" style="color: #4D7C8A;" @click.prevent="goToLogin">Inicia sesión</a>
@@ -71,13 +79,18 @@ export default {
       correo: "",
       password: "",
       confirmPassword: "",
-      showVerification: false
+      showVerification: false,
+      error: "",     
+      success: ""    
     };
   },
   methods: {
     async registerUser() {
+        this.error = "";
+        this.success = "";
+
       if (this.password !== this.confirmPassword) {
-        alert("Las contraseñas no coinciden.");
+        this.error = "Las contraseñas no coinciden";
         return;
       }
 
@@ -92,14 +105,14 @@ export default {
         });
 
        
-        alert("Usuario registrado correctamente.");
+        this.success = "Usuario registrado correctamente.";
         this.$router.push("/login");
       } catch (error) {
         
         if (error.response && error.response.data && error.response.data.message) {
-          alert("Error al registrar el usuario: " + error.response.data.message);
+          this.error =  error.response.data.message ;
         } else {
-          alert("Error al registrar el usuario. Por favor, inténtelo de nuevo más tarde.");
+          this.error =  error.response.data.message;
         }
       }
     },

@@ -36,7 +36,8 @@ const routes = [
   {
     path: '/dashboard',
     name: 'Dashboard',
-    component: Dashboard, 
+    component: Dashboard,
+    meta: { requiresAuth: true }, 
     children: [
       {
         path: '/dashboard', 
@@ -61,5 +62,16 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
 })
+
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem("token");
+  
+  if (to.meta.requiresAuth && !token) {
+    
+    next("/login");
+  } else {
+    next();
+  }
+});
 
 export default router
