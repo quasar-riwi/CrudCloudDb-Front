@@ -4,8 +4,8 @@
     <nav class="navbar navbar-expand-lg shadow-sm py-3" style="background-color: #1B4079;">
       <div class="container">
         <a class="navbar-brand d-flex align-items-center text-white fw-bold" href="#">
-          <img src="@/assets/logo.png" alt="Logo" height="40" class="me-2" />
-          Cloud Platform
+          <img src="@/assets/logo.png" alt="Logo" height="80" class="me-2" />
+   
         </a>
         <div class="ms-auto">
           <button class="btn btn-outline-light me-2" @click="goToLogin">Iniciar sesión</button>

@@ -10,20 +10,18 @@
         <form @submit.prevent="updateProfile" class="form">
           <div class="form-group">
             <label>Nombre</label>
-            <input type="text" v-model="user.nombre" class="form-control" />
+            <input type="text" v-model="user.nombre" class="form-control" disabled/>
           </div>
 
           <div class="form-group">
             <label>Apellido</label>
-            <input type="text" v-model="user.apellido" class="form-control" />
+            <input type="text" v-model="user.apellido" class="form-control" disabled />
           </div>
 
           <div class="form-group">
             <label>Correo Electrónico</label>
             <input type="email" v-model="user.correo" class="form-control" disabled />
           </div>
-
-          <button type="submit" class="btn-primary">Guardar Cambios</button>
         </form>
       </div>
 
@@ -79,14 +77,6 @@
         </button>
       </div>
 
-      <!-- ⚠️ Zona Peligrosa -->
-      <div class="card danger">
-        <h3>Zona Peligrosa</h3>
-        <p>¿Deseas eliminar tu cuenta? Esta acción no se puede deshacer.</p>
-        <button class="btn-danger" @click="deleteAccount">
-          Eliminar Cuenta
-        </button>
-      </div>
     </div>
   </div>
 </template>
@@ -130,6 +120,7 @@ export default {
           {
             currentPassword: this.currentPassword,
             newPassword: this.newPassword,
+            confirmNewPassword: this.confirmPassword, // 👈 coincide con ChangePasswordDto
           },
           {
             headers: {
@@ -139,15 +130,22 @@ export default {
           }
         );
 
-        if (response.status === 200) {
+        if (response.status === 200 && response.data.success) {
           alert("✅ Contraseña actualizada correctamente.");
           this.currentPassword = "";
           this.newPassword = "";
           this.confirmPassword = "";
+        } else {
+          alert(response.data.message || "❌ Error al cambiar la contraseña.");
         }
       } catch (error) {
         console.error("Error al cambiar la contraseña:", error);
-        alert("❌ Error al cambiar la contraseña.");
+
+        if (error.response && error.response.data && error.response.data.message) {
+          alert(`❌ ${error.response.data.message}`);
+        } else {
+          alert("❌ Error al cambiar la contraseña. Inténtalo de nuevo.");
+        }
       } finally {
         this.loading = false;
       }
@@ -171,7 +169,7 @@ export default {
   align-items: center;
   padding: 3rem 1rem;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  overflow: hidden; /* 🔹 evita scroll */
+  overflow: hidden;
 }
 
 .title {

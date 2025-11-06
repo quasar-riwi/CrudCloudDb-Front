@@ -3,13 +3,13 @@
     <nav class="navbar navbar-expand-lg shadow-sm py-3" style="background-color: #1B4079;">
       <div class="container">
         <a class="navbar-brand d-flex align-items-center text-white fw-bold" @click="goToWelcome" href="#">
-          <img src="@/assets/logo.png" alt="Logo" height="40" class="me-2" />
-          Cloud Platform
+          <img src="@/assets/logo.png" alt="Logo" height="90" class="me-2" />
+          
         </a>
       </div>
     </nav>
 
-    <section class="register-section d-flex align-items-center justify-content-center">
+    <section class="register-section d-flex align-items-center mt-5 justify-content-center">
       <div v-if="!showVerification" class="card shadow-lg border-0 p-4" style="max-width: 450px; width: 100%; background-color: #ffffffd8;">
         <h2 class="text-center fw-bold mb-4" style="color: #1B4079;">Crear cuenta</h2>
 
@@ -64,6 +64,7 @@
     </footer>
   </div>
 </template>
+
 
 <script>
 import axios from "axios";
@@ -125,3 +126,14 @@ export default {
   }
 };
 </script>
+<style>
+.register-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.register-section {
+  flex: 1;
+}
+</style>

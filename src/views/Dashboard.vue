@@ -3,7 +3,7 @@
     <aside class="sidebar">
       <div class="logo">
         <a class="navbar-brand d-flex align-items-center justify-content-center text-white fw-bold" @click="goToDashboard" href="#">
-          <img src="@/assets/logo.png" alt="Logo" height="60" /> 
+          <img src="@/assets/logo.png" alt="Logo" height="150" /> 
         </a>
       </div>
 

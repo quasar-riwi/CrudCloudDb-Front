@@ -4,8 +4,8 @@
     <nav class="navbar navbar-expand-lg shadow-sm py-3" style="background-color: #1B4079;">
       <div class="container">
         <a class="navbar-brand d-flex align-items-center text-white fw-bold" @click="goToWelcome" href="#">
-          <img src="@/assets/logo.png" alt="Logo" height="40" class="me-2" />
-          Cloud Platform
+          <img src="@/assets/logo.png" alt="Logo" height="100" class="me-2" />
+         
         </a>
       </div>
     </nav>
