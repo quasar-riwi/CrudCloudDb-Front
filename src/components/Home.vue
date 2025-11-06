@@ -10,7 +10,7 @@
     <section class="stats-grid">
       <div class="stat-card">
         <h6>Plan Actual</h6>
-        <h3>Gratuito</h3>
+        <h3>{{ user ? user.plan: 'Cargando...' }}</h3>
         <p>Hasta 2 bases de datos por motor</p>
       </div>
 

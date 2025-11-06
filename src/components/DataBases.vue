@@ -6,7 +6,6 @@
       <p>Gestiona, crea o elimina tus instancias en la nube desde aquí.</p>
     </header>
 
-    <!-- Resumen -->
     <section class="summary">
       <div class="summary-card">
         <h6>Total de Bases de Datos</h6>
@@ -22,7 +21,7 @@
       </div>
     </section>
 
-    <!-- Tabla de bases de datos -->
+
     <section class="table-section">
       <div class="table-header">
         <h4>Instancias Activas</h4>

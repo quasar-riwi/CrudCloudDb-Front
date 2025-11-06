@@ -10,7 +10,7 @@
       <nav class="menu">
         <button class="txtSize" @click="$router.push('/dashboard/home')">🏠 Inicio</button>
         <button class="txtSize" @click="$router.push('/dashboard/database')">💾 Mis Bases de Datos</button>
-        <button class="txtSize">💳 Planes y Suscripciones</button>
+        <button class="txtSize" @click="$router.push('/dashboard/Plans')">💳 Planes y Suscripciones</button>
         <button class="txtSize">⚙️ Configuración</button>
       </nav>
 
@@ -51,6 +51,10 @@ export default {
     await this.getUserInfo();
   },
   methods: {
+     logout() {
+      localStorage.removeItem("token");
+      this.$router.push("/login");
+    },
     async getUserInfo() {
       try {
         const token = localStorage.getItem("token");
@@ -60,20 +64,19 @@ export default {
           return;
         }
 
-        // ✅ Decodificar token para obtener ID
+    
         const decoded = jwtDecode.jwtDecode(token);
         console.log("Token decodificado:", decoded);
 
         const userId =
           decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
-
         if (!userId) {
           this.error = "No se pudo obtener el ID del usuario desde el token.";
           console.error(this.error);
           return;
         }
 
-        // ✅ Llamar al backend con el token
+   
         const response = await axios.get(`${API_URL}/${userId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -89,13 +92,7 @@ export default {
       }
       
     },
-    goToDashboard() {
-      this.$router.push("/dashboard/home");
-    },
-    logout() {
-      localStorage.removeItem("token");
-      this.$router.push("/login");
-    }
+
   }
   
 };
@@ -103,6 +100,7 @@ export default {
 
 <style scoped>
 .dashboard {
+  overflow: hidden;
   display: flex;
   height: 100vh;
   background-color: #f5f6fa;

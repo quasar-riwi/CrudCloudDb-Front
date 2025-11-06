@@ -1,10 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-
 import Welcome from '../views/Welcome.vue'
 import Dashboard from '../views/Dashboard.vue'
-import Home from '../components/Home.vue' // 
+import Home from '../components/Home.vue' 
 import DataBases from '@/components/DataBases.vue'
+import Members from '@/components/Plans.vue'
+import Plans from '@/components/Plans.vue'
 
 const routes = [
 
@@ -30,9 +31,6 @@ const routes = [
   component: () => import('@/views/EmailVerification.vue')
 },
 
-
-
-
   {
     path: '/dashboard',
     name: 'Dashboard',
@@ -55,6 +53,13 @@ const routes = [
         name: 'Dashboard/Database',
         component: DataBases,
         props: true,
+      },
+      {
+        path: 'plans', 
+        name: 'Dashboard/Plans',
+        component: Plans,
+        props: true,
+       
       },
       
     ],
