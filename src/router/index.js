@@ -4,8 +4,8 @@ import Welcome from '../views/Welcome.vue'
 import Dashboard from '../views/Dashboard.vue'
 import Home from '../components/Home.vue' 
 import DataBases from '@/components/DataBases.vue'
-import Members from '@/components/Plans.vue'
 import Plans from '@/components/Plans.vue'
+import Settings from '@/components/Settings.vue'
 
 const routes = [
 
@@ -58,6 +58,13 @@ const routes = [
         path: 'plans', 
         name: 'Dashboard/Plans',
         component: Plans,
+        props: true,
+       
+      },
+      {
+        path: 'settings', 
+        name: 'Dashboard/Settings',
+        component: Settings,
         props: true,
        
       },

@@ -11,7 +11,7 @@
         <button class="txtSize" @click="$router.push('/dashboard/home')">🏠 Inicio</button>
         <button class="txtSize" @click="$router.push('/dashboard/database')">💾 Mis Bases de Datos</button>
         <button class="txtSize" @click="$router.push('/dashboard/Plans')">💳 Planes y Suscripciones</button>
-        <button class="txtSize">⚙️ Configuración</button>
+        <button class="txtSize" @click="$router.push('/dashboard/Settings')">⚙️ Configuración</button>
       </nav>
 
       <div class="user-section">

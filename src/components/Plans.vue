@@ -3,7 +3,7 @@
     <h2 class="title">Elige el plan que mejor se adapte a ti</h2>
 
     <div class="plans-container">
-      <!-- Plan Gratuito -->
+
       <div
         class="plan-card free"
         :class="{ disabled: userPlan === 'Gratis' }"
@@ -23,7 +23,7 @@
         </button>
       </div>
 
-      <!-- Plan Intermedio -->
+
       <div
         class="plan-card medium"
         :class="{ disabled: userPlan !== 'Intermedio', disabled: userPlan === 'Intermedio' }"
@@ -43,7 +43,6 @@
         </button>
       </div>
 
-      <!-- Plan Avanzado -->
       <div
         class="plan-card pro"
         :class="{ disabled: userPlan === 'Avanzado' }"
@@ -178,20 +177,19 @@ export default {
   transform: scale(1.05);
 }
 
-/* Plan actual deshabilitado */
 .disabled {
   opacity: 0.6;
   pointer-events: none;
   transform: none !important;
 }
 
-/* Plan destacado */
+
 .featured {
   border: 3px solid #1B4079;
   transform: scale(1.05);
 }
 
-/* Responsivo */
+
 @media (max-width: 768px) {
   .plans-container {
     flex-direction: column;
