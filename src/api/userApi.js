@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // 🔹 URL base del backend (ajústala si el puerto cambia)
-const API_URL = "http://localhost:5005/api/Users";
+const API_URL = "https://service.quasar.andrescortes.dev/api/Users";
 
 // =======================================================
 // 📧 Verificar correo electrónico
