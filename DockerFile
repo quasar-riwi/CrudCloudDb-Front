@@ -1,0 +1,23 @@
+Etapa 1: construir el proyecto Vue
+FROM node:18-alpine as build
+
+WORKDIR /app
+COPY package.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+Etapa 2: servir el build con nginx
+FROM nginx:stable-alpine
+
+Elimina el contenido por defecto de nginx
+RUN rm -rf /usr/share/nginx/html/
+
+Copia el build del frontend
+COPY --from=build /app/dist /usr/share/nginx/html
+
+Expone el puerto 80
+EXPOSE 80
+
+Inicia Nginx
+CMD ["nginx", "-g", "daemon off;"]
