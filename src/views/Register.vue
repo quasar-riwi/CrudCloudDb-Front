@@ -80,8 +80,8 @@ export default {
       password: "",
       confirmPassword: "",
       showVerification: false,
-      error: "",     
-      success: ""    
+      error: "",
+      success: ""
     };
   },
   methods: {
@@ -104,11 +104,11 @@ export default {
           plan: "Gratis"
         });
 
-       
+
         this.success = "Usuario registrado correctamente.";
         this.$router.push("/login");
       } catch (error) {
-        
+
         if (error.response && error.response.data && error.response.data.message) {
           this.error =  error.response.data.message ;
         } else {
