@@ -105,7 +105,7 @@
 <script>
 import axios from "axios";
 
-const API_URL = "http://localhost:5005/api/Users/register";
+const API_URL = "https://service.quasar.andrescortes.dev/api/Users/register";
 
 export default {
   name: "Register",
@@ -118,7 +118,7 @@ export default {
       confirmPassword: "",
       showVerification: false,
       error: "",
-      success: "",
+      success: ""
     };
   },
   methods: {
@@ -141,9 +141,11 @@ export default {
           plan: "Gratis",
         });
 
+
         this.success = "Usuario registrado correctamente.";
         this.$router.push("/login");
       } catch (error) {
+
         if (error.response && error.response.data && error.response.data.message) {
           this.error = error.response.data.message;
         } else {
