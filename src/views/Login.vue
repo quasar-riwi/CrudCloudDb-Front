@@ -1,65 +1,69 @@
 <template>
-  <div class="login-page">
+  <div class="login-page text-white">
 
-    <nav class="navbar navbar-expand-lg shadow-sm py-3" style="background-color: #1B4079;">
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg py-3 fixed-top animate-navbar" style="background-color: #0a0a17;">
       <div class="container">
         <a class="navbar-brand d-flex align-items-center text-white fw-bold" @click="goToWelcome" href="#">
-          <img src="@/assets/logo.png" alt="Logo" height="40" class="me-2" />
-          Cloud Platform
+          <img src="@/assets/logo.png" alt="Logo" height="50" class="me-2 fade-in" />
+          CrudCloud
         </a>
       </div>
     </nav>
 
+    <!-- LOGIN -->
     <section class="login-section d-flex align-items-center justify-content-center">
-      <div class="card shadow-lg border-0 p-4" style="max-width: 450px; width: 100%; background-color: #ffffffd8;">
-        <h2 class="text-center fw-bold mb-4" style="color: #1B4079;">Iniciar sesión</h2>
+      <div class="card shadow-lg border-0 p-4 fade-in-up" style="max-width: 420px; width: 100%; background-color: #181826;">
+        <h2 class="text-center fw-bold mb-4 text-primary">Iniciar sesión</h2>
 
         <form @submit.prevent="loginUser">
-          <div class="mb-3">
-            <label class="form-label fw-semibold" for="correo">Correo electrónico</label>
+          <div class="mb-3 fade-in-up delay-1">
+            <label class="form-label fw-semibold text-white"  for="correo">Correo electrónico</label>
             <input
               type="email"
               id="correo"
-              class="form-control"
+              class="form-control bg-dark text-white border-0 shadow-sm"
               v-model="correo"
               required
               placeholder="ejemplo@correo.com"
             />
           </div>
 
-          <div class="mb-4">
-            <label class="form-label fw-semibold" for="password">Contraseña</label>
+          <div class="mb-4 fade-in-up delay-2">
+            <label class="form-label fw-semibold text-white" for="password">Contraseña</label>
             <input
               type="password"
               id="password"
-              class="form-control"
+              class="form-control bg-dark text-white border-0 shadow-sm"
               v-model="password"
               required
               placeholder="••••••••"
             />
           </div>
 
-          <button type="submit" class="btn w-100 text-white fw-semibold" style="background-color: #1B4079;">
+          <button type="submit" class="btn w-100 fw-semibold text-white btn-anim" style="background-color: #007bff;">
             Iniciar sesión
           </button>
         </form>
 
-        <p class="text-center mt-4 mb-0 text-muted">
+        <p class="text-center mt-4 mb-0 text-light-emphasis fade-in-up delay-3">
           ¿No tienes cuenta?
-          <a href="#" class="fw-semibold" style="color: #4D7C8A;" @click.prevent="goToRegister">
+          <a href="#" class="fw-semibold link-primary text-decoration-none" @click.prevent="goToRegister">
             Regístrate aquí
           </a>
         </p>
 
-        <div v-if="error" class="alert alert-danger mt-3 text-center">
+        <div v-if="error" class="alert alert-danger mt-3 text-center fade-in">
           {{ error }}
         </div>
       </div>
     </section>
 
-    <footer class="text-center py-3 mt-5" style="background-color: #1B4079; color: white;">
-      <small>© 2025 Cloud Platform — Todos los derechos reservados.</small>
+    <!-- FOOTER -->
+    <footer class="text-center py-3 fade-in" style="background-color: #0a0a17; color: rgba(255,255,255,0.8);">
+      <small>© 2025 CrudCloud. Todos los derechos reservados.</small>
     </footer>
+
   </div>
 </template>
 
@@ -93,15 +97,9 @@ export default {
         const data = await loginUser(credentials);
         console.log("Respuesta del backend:", data);
 
-   
-        if (data.token) {
-          localStorage.setItem("token", data.token);
-        }
-        if (data.user) {
-          localStorage.setItem("user", JSON.stringify(data.user));
-        }
+        if (data.token) localStorage.setItem("token", data.token);
+        if (data.user) localStorage.setItem("user", JSON.stringify(data.user));
 
-        
         if (data.user && !data.user.EmailVerified) {
           this.$router.push("/verify-notice"); 
         } else {
@@ -126,29 +124,91 @@ export default {
 <style scoped>
 .login-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #cfe4ef 0%, #e7f2dc 100%);
+  background: radial-gradient(ellipse at center, #111122 0%, #0a0a17 100%);
   display: flex;
   flex-direction: column;
+  padding-top: 70px;
 }
 
 .login-section {
   flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
+/* INPUTS */
 .form-control {
-  border-radius: 8px;
-  border: 1px solid #b7c9cc;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+
 }
 .form-control:focus {
-  box-shadow: 0 0 0 0.2rem rgba(27, 64, 121, 0.25);
-  border-color: #1B4079;
+  outline: none;
+  box-shadow: 0 0 12px rgba(0, 123, 255, 0.4);
 }
 
-.btn:hover {
-  background-color: #4D7C8A !important;
+/* BOTÓN */
+.btn-anim {
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+.btn-anim:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 0 20px rgba(0, 123, 255, 0.7);
 }
 
+/* ANIMACIONES */
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 1s forwards;
+}
+
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 1s forwards;
+}
+
+.delay-1 { animation-delay: 0.2s; }
+.delay-2 { animation-delay: 0.4s; }
+.delay-3 { animation-delay: 0.6s; }
+
+.animate-navbar {
+  animation: slideDown 1s ease-out;
+}
+
+.text-light-emphasis {
+  color: white;
+}
+
+/* KEYFRAMES */
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* CARD */
 .card {
-  border-radius: 16px;
+  border-radius: 20px;
+  animation: fadeUp 1.2s forwards;
+  backdrop-filter: blur(8px);
 }
 </style>

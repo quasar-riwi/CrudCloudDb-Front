@@ -21,7 +21,6 @@
       </div>
     </section>
 
-
     <section class="table-section">
       <div class="table-header">
         <h4>Instancias Activas</h4>
@@ -79,23 +78,11 @@ export default {
 </script>
 
 <style scoped>
-/* 🎨 Paleta CCD */
-:root {
-  --primary: #3B82F6;
-  --secondary: #1E293B;
-  --background: #F9FAFB;
-  --text: #111827;
-  --muted: #6B7280;
-  --card-bg: #ffffff;
-  --radius: 12px;
-}
-
-/* Contenedor */
 .databases-view {
-  background-color: var(--background);
+  background: linear-gradient(180deg, #0b0e1a 0%, #101223 100%);
   min-height: 100vh;
   padding: 2rem;
-  color: var(--text);
+  color: #f2f6ff;
   font-family: 'Inter', 'Segoe UI', sans-serif;
   display: flex;
   flex-direction: column;
@@ -105,13 +92,14 @@ export default {
 /* Encabezado */
 .header h2 {
   font-size: 1.8rem;
-  color: var(--secondary);
+  color: #4f8cff;
   font-weight: 700;
   margin-bottom: 0.25rem;
+  text-shadow: 0 0 15px rgba(79, 140, 255, 0.4);
 }
 
 .header p {
-  color: var(--muted);
+  color: #a0a8c3;
   font-size: 1rem;
 }
 
@@ -123,40 +111,42 @@ export default {
 }
 
 .summary-card {
-  background-color: var(--card-bg);
-  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
   padding: 1.5rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid rgba(79, 140, 255, 0.2);
   text-align: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 15px rgba(79, 140, 255, 0.15);
   transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
 }
 
 .summary-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 0 20px rgba(79, 140, 255, 0.4);
 }
 
 .summary-card h6 {
-  color: var(--muted);
+  color: #b6bde0;
   font-size: 0.85rem;
   margin-bottom: 0.25rem;
   text-transform: uppercase;
 }
 
 .summary-card h3 {
-  color: var(--primary);
-  font-size: 1.5rem;
+  color: #ffffff;
+  font-size: 1.6rem;
   font-weight: 700;
 }
 
 /* Tabla */
 .table-section {
-  background-color: var(--card-bg);
-  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
   padding: 1.5rem;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  border: 1px solid rgba(79, 140, 255, 0.2);
+  box-shadow: 0 8px 15px rgba(79, 140, 255, 0.1);
+  backdrop-filter: blur(8px);
 }
 
 .table-header {
@@ -167,23 +157,26 @@ export default {
 }
 
 .table-header h4 {
-  color: var(--secondary);
+  color: #4f8cff;
   font-weight: 700;
 }
 
 .btn-main {
-  background-color: var(--primary);
+  background: linear-gradient(90deg, #0d47a1, #1b74ff);
   color: #fff;
   border: none;
   border-radius: 8px;
   padding: 0.6rem 1.4rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 12px rgba(79, 140, 255, 0.3);
 }
 
 .btn-main:hover {
-  background-color: #2563eb;
+  background: linear-gradient(90deg, #1b74ff, #4f8cff);
+  transform: scale(1.05);
+  box-shadow: 0 0 18px rgba(79, 140, 255, 0.5);
 }
 
 /* Tabla base */
@@ -194,24 +187,25 @@ export default {
 
 .database-table th,
 .database-table td {
-  padding: 0.8rem;
+  padding: 0.9rem;
   text-align: left;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   font-size: 0.95rem;
 }
 
 .database-table th {
-  color: var(--secondary);
+  color: #8ea4ff;
   font-weight: 700;
-  background-color: #f3f4f6;
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .database-table tr:hover {
-  background-color: #f9fafb;
+  background-color: rgba(255, 255, 255, 0.08);
+  transition: 0.3s ease;
 }
 
 .status.active {
-  color: #10b981;
+  color: #22c55e;
   font-weight: 600;
 }
 
@@ -226,15 +220,16 @@ export default {
   border: none;
   cursor: pointer;
   font-weight: 600;
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .btn-view {
-  color: var(--primary);
+  color: #4f8cff;
 }
 
 .btn-view:hover {
-  color: #2563eb;
+  color: #72a2ff;
+  transform: scale(1.05);
 }
 
 .btn-delete {
@@ -243,13 +238,14 @@ export default {
 }
 
 .btn-delete:hover {
-  color: #dc2626;
+  color: #ff6b6b;
+  transform: scale(1.05);
 }
 
 /* Vacío */
 .empty {
   text-align: center;
-  color: var(--muted);
+  color: #a0a8c3;
   padding: 2rem;
 }
 </style>
