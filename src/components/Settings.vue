@@ -101,7 +101,7 @@ export default {
         this.loading = true;
         const token = localStorage.getItem("token");
         const response = await axios.post(
-          "http://localhost:5005/api/Users/change-password",
+          "https://service.quasar.andrescortes.dev/api/Users/change-password",
           {
             currentPassword: this.currentPassword,
             newPassword: this.newPassword,
@@ -135,7 +135,7 @@ export default {
 
 <style scoped>
 .settings-page {
- 
+
   min-height: 100vh;
   color: white;
   animation: fadeIn 1s ease-in-out;
