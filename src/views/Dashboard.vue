@@ -30,7 +30,6 @@
       </div>
     </aside>
 
-    <!-- CONTENIDO -->
     <main class="content">
       <section class="main-content fade-up">
         <router-view :user="user" />
