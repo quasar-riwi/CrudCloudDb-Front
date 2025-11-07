@@ -30,7 +30,6 @@
       </div>
     </aside>
 
-    <!-- CONTENIDO -->
     <main class="content">
       <section class="main-content fade-up">
         <router-view :user="user" />
@@ -61,35 +60,42 @@ export default {
       localStorage.removeItem("token");
       this.$router.push("/login");
     },
-    async getUserInfo() {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          this.error = "No hay token. Inicia sesión.";
-          this.$router.push("/login");
-          return;
-        }
+async getUserInfo() {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      this.error = "No hay token. Inicia sesión.";
+      this.$router.push("/login");
+      return;
+    }
 
-        const decoded = jwtDecode.jwtDecode(token);
-        const userId =
-          decoded[
-            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-          ];
-        if (!userId) {
-          this.error = "No se pudo obtener el ID del usuario desde el token.";
-          return;
-        }
+    const decoded = jwtDecode.jwtDecode(token);
+    const userId =
+      decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+    if (!userId) {
+      this.error = "No se pudo obtener el ID del usuario desde el token.";
+      return;
+    }
 
-        const response = await axios.get(`${API_URL}/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+    const response = await axios.get(`${API_URL}/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+      withCredentials: true, // 🔥 importante si usas cookies o CORS con credenciales
+    });
 
-        this.user = response.data.data;
-      } catch (error) {
-        this.error = "Error al obtener los datos del usuario.";
-        console.error(error);
-      }
-    },
+    this.user = response.data.data;
+  } catch (error) {
+    if (error.response) {
+      console.error("Error del servidor:", error.response.status, error.response.data);
+      this.error = `Error ${error.response.status}: ${error.response.data.message}`;
+    } else if (error.request) {
+      console.error("No se recibió respuesta del servidor:", error.request);
+      this.error = "No se pudo conectar al servidor.";
+    } else {
+      console.error("Error desconocido:", error.message);
+      this.error = "Error inesperado.";
+    }
+  }
+},
     goToDashboard() {
       this.$router.push("/dashboard/home");
     },
