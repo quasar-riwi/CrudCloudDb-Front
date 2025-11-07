@@ -53,6 +53,10 @@
           </a>
         </p>
 
+        <div v-if="message" class="alert alert-info text-center mt-3">
+            {{ message }}
+        </div>
+
         <div v-if="error" class="alert alert-danger mt-3 text-center fade-in">
           {{ error }}
         </div>
@@ -76,10 +80,25 @@ export default {
     return {
       correo: "",
       password: "",
-      error: null
+      error: null,
+      message: "",
     };
   },
+  mounted() {
+    if (this.$route.query.registered == "true") {
+      this.message = "Se te ha enviado un correo para verificar tu cuenta.";
+
+      // 🕒 Eliminar el mensaje después de 10 segundos
+      setTimeout(() => {
+        this.message = "";
+      }, 10000);
+    }
+  },
+  
+  
   methods: {
+      
+
     async loginUser() {
       this.error = null;
 
