@@ -12,7 +12,7 @@
     </nav>
 
     <!-- FORMULARIO -->
-    <section class="register-section  d-flex align-items-center justify-content-center" style="border-radius: 30px;">
+    <section class="register-section d-flex align-items-center justify-content-center">
       <div
         v-if="!showVerification"
         class="card border-0 shadow-lg p-4 fade-up"
@@ -69,7 +69,7 @@
             />
           </div>
 
-          <div class="mb-4">
+          <div class="mb-2">
             <label class="form-label fw-semibold text-white" for="confirm">Confirmar contraseña</label>
             <input
               type="password"
@@ -81,7 +81,26 @@
             />
           </div>
 
-          <button type="submit" class="btn btn-primary w-100 fw-semibold py-2 shadow-sm">Registrarse</button>
+          <!-- Mensaje dinámico de coincidencia -->
+          <div v-if="password && confirmPassword" class="text-center mb-3">
+            <small
+              v-if="passwordsMatch"
+              class="text-success fw-semibold"
+            >✔ Las contraseñas coinciden</small>
+            <small
+              v-else
+              class="text-danger fw-semibold"
+            >✖ Las contraseñas no coinciden</small>
+          </div>
+
+          <!-- Botón con spinner -->
+          <button type="submit" class="btn btn-primary w-100 fw-semibold py-2 shadow-sm" :disabled="loading">
+            <span v-if="!loading">Registrarse</span>
+            <span v-else>
+              <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+              Registrando...
+            </span>
+          </button>
         </form>
 
         <div v-if="error" class="alert alert-danger mt-3 text-center">{{ error }}</div>
@@ -119,38 +138,51 @@ export default {
       showVerification: false,
       error: "",
       success: "",
+      loading: false,
     };
+  },
+  computed: {
+    passwordsMatch() {
+      return this.password === this.confirmPassword;
+    },
   },
   methods: {
     async registerUser() {
-      this.error = "";
-      this.success = "";
+  this.error = "";
+  this.success = "";
 
-      if (this.password !== this.confirmPassword) {
-        this.error = "Las contraseñas no coinciden";
-        return;
-      }
+  if (!this.passwordsMatch) {
+    this.error = "Las contraseñas no coinciden";
+    return;
+  }
 
-      try {
-        await axios.post(API_URL, {
-          nombre: this.nombre,
-          apellido: this.apellido,
-          correo: this.correo,
-          contraseña: this.password,
-          confirmarContraseña: this.confirmPassword,
-          plan: "Gratis",
-        });
+  this.loading = true;
 
-        this.success = "Usuario registrado correctamente.";
-        this.$router.push("/login");
-      } catch (error) {
-        if (error.response && error.response.data && error.response.data.message) {
-          this.error = error.response.data.message;
-        } else {
-          this.error = "Error al registrar el usuario.";
-        }
-      }
-    },
+  try {
+    await axios.post(API_URL, {
+      nombre: this.nombre,
+      apellido: this.apellido,
+      correo: this.correo,
+      contraseña: this.password,
+      confirmarContraseña: this.confirmPassword,
+      plan: "Gratis",
+    });
+
+    this.success = "Usuario registrado correctamente.";
+    setTimeout(() => {
+      // 👉 enviamos un query param para mostrar el mensaje en login
+      this.$router.push({ path: "/login", query: { registered: "true" } });
+    }, 1000);
+  } catch (error) {
+    if (error.response?.data?.message) {
+      this.error = error.response.data.message;
+    } else {
+      this.error = "Error al registrar el usuario.";
+    }
+  } finally {
+    this.loading = false;
+  }
+},
     goToLogin() {
       this.$router.push("/login");
     },
@@ -169,7 +201,6 @@ export default {
   background: radial-gradient(ellipse at center, #111122 0%, #0a0a17 100%);
 }
 
-/* Centrar correctamente el formulario */
 .register-section {
   flex: 1;
   display: flex;
@@ -179,7 +210,6 @@ export default {
   padding-bottom: 60px;
 }
 
-/* Animaciones suaves */
 .fade-up {
   opacity: 0;
   transform: translateY(25px);
@@ -193,7 +223,6 @@ export default {
   }
 }
 
-/* Inputs oscuros */
 .form-control {
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -203,29 +232,18 @@ export default {
   color: rgba(255, 255, 255, 0.6);
 }
 
-/* Botón */
 .btn-primary {
   background-color: #4d7c8a;
   border: none;
   transition: all 0.2s ease-in-out;
 }
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   background-color: #5a93a2;
   transform: translateY(-2px);
   box-shadow: 0 0 15px rgba(77, 124, 138, 0.6);
 }
 
-/* Navbar efecto al hacer scroll */
-.navbar {
-  transition: background-color 0.4s ease, box-shadow 0.4s ease;
-}
-.navbar.scrolled {
-  background-color: #0a0a17cc !important;
-  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.4);
-}
-
-/* Footer */
-footer {
-  font-size: 0.9rem;
+.spinner-border {
+  color: white !important;
 }
 </style>

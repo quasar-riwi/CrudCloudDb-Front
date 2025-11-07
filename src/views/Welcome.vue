@@ -25,7 +25,7 @@
         <h1 class="fw-bold display-4 mb-3">
           Gestiona tus datos en la nube, <span class="text-primary">sin límites.</span>
         </h1>
-        <p class="lead mb-4 text-light-emphasis">
+        <p class="lead mb-4 ">
           CrudCloud automatiza la complejidad de las bases de datos para que puedas enfocarte en construir aplicaciones increíbles,
           no en administrar infraestructura.
         </p>
@@ -40,7 +40,7 @@
     <section id="beneficios" class="py-5" style="background-color: #181826;">
       <div class="container text-center">
         <h2 class="fw-bold mb-4">¿Por qué CrudCloud?</h2>
-        <p class="text-light-emphasis mb-5">Simplificamos la gestión de bases de datos para acelerar tu desarrollo.</p>
+        <p class=" mb-5">Simplificamos la gestión de bases de datos para acelerar tu desarrollo.</p>
 
         <div class="row g-4">
           <div class="col-md-4">
@@ -48,7 +48,7 @@
               <div class="card-body">
                 <div class="mb-3 fs-1 text-primary">⚡</div>
                 <h5 class="fw-bold">Despliegue Rápido</h5>
-                <p class="text-light-emphasis">Crea instancias de bases de datos en segundos con nuestra interfaz intuitiva o API.</p>
+                <p class="">Crea instancias de bases de datos en segundos con nuestra interfaz intuitiva o API.</p>
               </div>
             </div>
           </div>
@@ -57,7 +57,7 @@
               <div class="card-body">
                 <div class="mb-3 fs-1 text-primary">📈</div>
                 <h5 class="fw-bold">Escalabilidad Automática</h5>
-                <p class="text-light-emphasis">Escala tus recursos vertical y horizontalmente sin interrupciones, según la demanda.</p>
+                <p class="">Escala tus recursos vertical y horizontalmente sin interrupciones, según la demanda.</p>
               </div>
             </div>
           </div>
@@ -66,7 +66,7 @@
               <div class="card-body">
                 <div class="mb-3 fs-1 text-primary">🔒</div>
                 <h5 class="fw-bold">Seguridad Integrada</h5>
-                <p class="text-light-emphasis">Backups automáticos, encriptación y redes privadas para proteger tus datos.</p>
+                <p class="">Backups automáticos, encriptación y redes privadas para proteger tus datos.</p>
               </div>
             </div>
           </div>
@@ -78,28 +78,28 @@
     <section id="funciona" class="py-5 bg-dark text-center">
       <div class="container">
         <h2 class="fw-bold mb-4">¿Cómo funciona?</h2>
-        <p class="text-light-emphasis mb-5">En solo tres simples pasos, tendrás tu base de datos lista para producción.</p>
+        <p class=" mb-5">En solo tres simples pasos, tendrás tu base de datos lista para producción.</p>
 
         <div class="row g-4 justify-content-center">
           <div class="col-md-4">
             <div class="p-4 border border-primary rounded-4 step-card">
               <div class="fs-4 mb-2 fw-bold text-primary">1</div>
               <h5>Elige tu motor</h5>
-              <p class="text-light-emphasis">Selecciona entre una variedad de bases de datos SQL y NoSQL populares.</p>
+              <p class="">Selecciona entre una variedad de bases de datos SQL y NoSQL populares.</p>
             </div>
           </div>
           <div class="col-md-4">
             <div class="p-4 border border-primary rounded-4 step-card">
               <div class="fs-4 mb-2 fw-bold text-primary">2</div>
               <h5>Configura tu plan</h5>
-              <p class="text-light-emphasis">Define los recursos como CPU, RAM y almacenamiento que tu app necesita.</p>
+              <p class="">Define los recursos como CPU, RAM y almacenamiento que tu app necesita.</p>
             </div>
           </div>
           <div class="col-md-4">
             <div class="p-4 border border-primary rounded-4 step-card">
               <div class="fs-4 mb-2 fw-bold text-primary">3</div>
               <h5>Conecta tu app</h5>
-              <p class="text-light-emphasis">Usa la cadena de conexión proporcionada y listo en minutos.</p>
+              <p class="">Usa la cadena de conexión proporcionada y listo en minutos.</p>
             </div>
           </div>
         </div>
@@ -111,11 +111,27 @@
       <div class="container text-center">
         <h2 class="fw-bold mb-5">Motores Soportados</h2>
         <div class="row justify-content-center g-4">
-          <div class="col-6 col-md-2" v-for="i in 5" :key="i">
+          <div class="col-6 col-md-2"  :key="i">
             <div class="card bg-dark border-0 shadow-sm p-3 motor-card">
-              <img src="@/assets/logo.png" alt="Motor" class="img-fluid" />
+              <img src="@/assets/postgre.png" alt="Motor" class="img-fluid" />
             </div>
           </div>
+          <div class="col-6 col-md-2"  :key="i">
+            <div class="card bg-dark border-0 shadow-sm p-3 motor-card">
+              <img src="@/assets/mysql.png" alt="Motor" class="img-fluid" />
+            </div>
+          </div>
+           <div class="col-6 col-md-2"  :key="i">
+            <div class="card bg-dark border-0 shadow-sm p-3 motor-card">
+              <img src="@/assets/sqlserve.png" alt="Motor" class="img-fluid" />
+            </div>
+          </div>
+          <div class="col-6 col-md-2"  :key="i">
+            <div class="card bg-dark border-0 shadow-sm p-3 motor-card">
+              <img src="@/assets/mongodb.png" alt="Motor" class="img-fluid" />
+            </div>
+          </div>
+          
         </div>
       </div>
     </section>
@@ -124,7 +140,7 @@
     <section id="planes" class="py-5 bg-dark">
       <div class="container text-center">
         <h2 class="fw-bold mb-4">Planes y Beneficios</h2>
-        <p class="text-light-emphasis mb-5">
+        <p class=" mb-5">
           Planes transparentes que escalan con tus necesidades. Sin costos ocultos.
         </p>
 
@@ -134,7 +150,7 @@
               <div class="badge bg-primary mb-2">{{ plan.etiqueta }}</div>
               <h5 class="fw-bold">{{ plan.nombre }}</h5>
               <h2 class="fw-bold">{{ plan.precio }}<span class="fs-6">/mes</span></h2>
-              <p class="text-light-emphasis">{{ plan.descripcion }}</p>
+              <p class="">{{ plan.descripcion }}</p>
               <button class="btn btn-light mt-auto" @click="goToRegister">Seleccionar Plan</button>
             </div>
           </div>
@@ -146,7 +162,7 @@
     <section class="text-center py-5" style="background-color: #181826;">
       <div class="container">
         <h2 class="fw-bold mb-4">¿Listo para empezar?</h2>
-        <p class="text-light-emphasis mb-4">
+        <p class=" mb-4">
           Crea tu cuenta y lanza tu primera base de datos en menos de 5 minutos.
         </p>
         <button class="btn btn-primary btn-lg px-4" @click="goToRegister">Crear cuenta gratuita</button>
@@ -167,9 +183,9 @@ export default {
   data() {
     return {
       planes: [
-        { nombre: "Gratis", precio: "$0", descripcion: "1 base de datos, 1 GB SSD, backups diarios, soporte por email.", etiqueta: "Básico" },
-        { nombre: "Intermedio", precio: "$5,000", descripcion: "Hasta 10 bases de datos, 50 GB SSD, escalado automático, soporte por email.", etiqueta: "Popular" },
-        { nombre: "Avanzado", precio: "$10,000", descripcion: "Bases de datos ilimitadas, almacenamiento personalizado, soporte 24/7.", etiqueta: "Pro" },
+        { nombre: "Gratis", precio: "$0", descripcion: "hasta 2 bases de datos por motor.", etiqueta: "Básico" },
+        { nombre: "Intermedio", precio: "$5,000", descripcion: "hasta 5 bases de datos por motor ", etiqueta: "Popular" },
+        { nombre: "Avanzado", precio: "$10,000", descripcion: "hasta 10 bases de datos por motor", etiqueta: "Pro" },
       ],
     };
   },
@@ -209,10 +225,31 @@ export default {
 
 <style scoped>
 .hero {
-  background: radial-gradient(ellipse at center, #111122 0%, #0a0a17 100%);
+
+  position: relative;
   min-height: 100vh;
   color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: radial-gradient(ellipse at center, #111122 0%, #0a0a17 100%);
+  overflow: hidden;
   animation: fadeInHero 1.5s ease-in-out;
+}
+
+.hero:before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("@/assets/fondo.avif") center/cover no-repeat;
+  opacity: 0.105; /* ← ajusta la transparencia a tu gusto */
+  z-index: 0;
+}
+
+.hero .container {
+  position: relative;
+  z-index: 1;
 }
 
 /* Animaciones base */
@@ -298,8 +335,6 @@ section.show {
   }
 }
 
-/* Textos */
-.text-light-emphasis {
-  color: rgba(255, 255, 255, 0.6);
-}
+
+
 </style>
