@@ -43,7 +43,7 @@
 import axios from "axios";
 import * as jwtDecode from "jwt-decode";
 
-const API_URL = "http://localhost:5005/api/Users";
+const API_URL = "https://service.quasar.andrescortes.dev/api/Users";
 
 export default {
   name: "Dashboard",
