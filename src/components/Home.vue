@@ -1,63 +1,63 @@
 <template>
-  <div class="home-dashboard">
-
-    <header class="header">
-      <h2>👋 {{ user ? user.nombre : 'Cargando...' }}</h2>
-      <p>Este es tu panel principal de <strong>CrudCloudDb Platform</strong>.</p>
+  <div class="home-dashboard text-white">
+    <!-- Header -->
+    <header class="header text-center mb-5 fade-in-down">
+      <h2 class="fw-bold">👋 {{ user ? user.nombre : 'Cargando...' }}</h2>
+      <p>Bienvenido a tu panel de <strong>Cloud Platform</strong>.</p>
     </header>
 
-
-    <section class="stats-grid">
-      <div class="stat-card">
-        <h6>Plan Actual</h6>
-        <h3>{{ user ? user.plan: 'Cargando...' }}</h3>
-        <p>Hasta 2 bases de datos por motor</p>
-      </div>
-
-      <div class="stat-card">
-        <h6>Bases de Datos Activas</h6>
-        <h3>6</h3>
-        <p>de 12 disponibles</p>
-      </div>
-
-      <div class="stat-card">
-        <h6>Estado del Sistema</h6>
-        <h3 class="status-active">🟢 Operativo</h3>
-      </div>
-
-      <div class="stat-card">
-        <h6>Última Actividad</h6>
-        <h3>Hace 3 horas</h3>
-        <p>Creaste una base de datos PostgreSQL</p>
-      </div>
-    </section>
-
-
-    <section class="engines">
-      <h4>Tus motores disponibles</h4>
-      <div class="engine-grid">
-        <div class="engine-card">
-          <h5>MySQL</h5>
-          <p>2 instancias activas</p>
-          <button>Ver detalles</button>
-        </div>
-
-        <div class="engine-card">
-          <h5>PostgreSQL</h5>
-          <p>1 instancia activa</p>
-          <button>Ver detalles</button>
-        </div>
-
-        <div class="engine-card">
-          <h5>MongoDB</h5>
-          <p>3 instancias activas</p>
-          <button>Ver detalles</button>
+    <!-- Stats -->
+    <section class="container fade-in-up">
+      <div class="row g-4 justify-content-center">
+        <div
+          class="col-md-3"
+          v-for="(stat, i) in stats"
+          :key="i"
+        >
+          <div
+            class="card stat-card text-center p-4 h-100 shadow border-0 bg-opacity-75"
+            style="background-color: #ffffffd8;"
+          >
+            <h6 class="text-dark mb-2">{{ stat.title }}</h6>
+            <h3 class="fw-bold" style="color: #1B4079;">{{ stat.value }}</h3>
+            <p class="text-muted mb-0">{{ stat.desc }}</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <div class="cta">
-      <button class="btn-main">
+    <!-- Engines -->
+    <section class="container mt-5 fade-in-up">
+      <h4 class="fw-bold mb-4 text-center text-white">⚙️ Tus motores disponibles</h4>
+      <div class="row g-4 justify-content-center">
+        <div
+          class="col-md-3"
+          v-for="(engine, i) in engines"
+          :key="i"
+        >
+          <div
+            class="card engine-card text-center p-4 h-100 shadow border-0 bg-opacity-75"
+            style="background-color: #ffffffd8;"
+          >
+            <h5 class="fw-bold" style="color: #1B4079;">{{ engine.name }}</h5>
+            <p class="text-muted mb-3">{{ engine.instances }}</p>
+            <button
+              class="btn w-100 text-white fw-semibold"
+              style="background-color: #1B4079;"
+            >
+              Ver detalles
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <div class="text-center mt-5 fade-in-up">
+      <button
+        class="btn text-white fw-bold px-5 py-3 shadow-lg rounded-pill zoom-btn"
+        style="background-color: #1B4079;"
+      >
         + Crear Nueva Base de Datos
       </button>
     </div>
@@ -67,168 +67,86 @@
 <script>
 export default {
   name: "Home",
-  props: {
-    user: Object
+  props: { user: Object },
+  data() {
+    return {
+      stats: [
+        { title: "Plan Actual", value: this.user ? this.user.plan : "Cargando...", desc: "Hasta 2 bases de datos por motor" },
+        { title: "Bases Activas", value: "6", desc: "de 12 disponibles" },
+        { title: "Estado del Sistema", value: "🟢 Operativo", desc: "" },
+        { title: "Última Actividad", value: "Hace 3 horas", desc: "Creaste una base PostgreSQL" },
+      ],
+      engines: [
+        { name: "MySQL", instances: "2 instancias activas" },
+        { name: "PostgreSQL", instances: "1 instancia activa" },
+        { name: "MongoDB", instances: "3 instancias activas" },
+      ]
+    };
   }
 };
 </script>
 
 <style scoped>
-
-:root {
-  --primary: #3B82F6; /* azul tech cloud */
-  --secondary: #1E293B; /* azul grisáceo oscuro */
-  --background: #F9FAFB; /* fondo panel */
-  --text: #111827; /* texto principal */
-  --muted: #6B7280; /* texto secundario */
-  --card-bg: #ffffff;
-  --radius: 12px;
-}
-
-/* 🧱 Contenedor principal */
 .home-dashboard {
-  background-color: var(--background);
+
   min-height: 100vh;
-  padding: 2rem;
-  color: var(--text);
+  padding: 3rem 1rem;
   font-family: 'Inter', 'Segoe UI', sans-serif;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
 }
 
-/* 🏷️ Encabezado */
+/* Header */
 .header h2 {
-  font-size: 1.8rem;
-  color: var(--secondary);
-  font-weight: 700;
-  margin-bottom: 0.25rem;
+  font-size: 2rem;
+  color: #ffffff;
 }
-
 .header p {
-  color: var(--muted);
-  font-size: 1rem;
+  color: #e6e6e6;
+  font-size: 1.1rem;
 }
 
-/* 📊 Tarjetas de estadísticas */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 1.5rem;
+/* Animaciones */
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeInUp 1s ease forwards;
+}
+.fade-in-down {
+  opacity: 0;
+  transform: translateY(-30px);
+  animation: fadeInDown 1s ease forwards;
+}
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fadeInDown {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.stat-card {
-  background-color: var(--card-bg);
-  border-radius: var(--radius);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-  padding: 1.5rem;
-  transition: all 0.3s ease;
-  border: 1px solid #e5e7eb;
-}
-
-.stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.stat-card h6 {
-  color: var(--muted);
-  font-size: 0.85rem;
-  margin-bottom: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.stat-card h3 {
-  color: var(--primary);
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 0.25rem;
-}
-
-.stat-card p {
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.status-active {
-  color: #10b981; /* verde éxito */
-}
-
-/* ⚙️ Motores */
-.engines h4 {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--secondary);
-  margin-bottom: 1rem;
-}
-
-.engine-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.2rem;
-}
-
-.engine-card {
-  background-color: var(--card-bg);
-  border-radius: var(--radius);
-  padding: 1.5rem;
-  border: 1px solid #e5e7eb;
-  transition: all 0.3s ease;
-}
-
+/* Tarjetas */
+.stat-card:hover,
 .engine-card:hover {
-  border-color: var(--primary);
-  transform: translateY(-3px);
+  transform: translateY(-8px) scale(1.02);
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
 }
 
-.engine-card h5 {
-  color: var(--secondary);
-  font-weight: 600;
-  margin-bottom: 0.25rem;
+/* Botón principal */
+.zoom-btn {
+  transition: all 0.3s ease;
+}
+.zoom-btn:hover {
+  transform: scale(1.08);
+  background-color: #153663 !important;
 }
 
-.engine-card p {
-  color: var(--muted);
-  margin-bottom: 0.75rem;
-}
-
-.engine-card button {
-  background-color: var(--primary);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
-  width: 100%;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.engine-card button:hover {
-  background-color: #2563eb;
-}
-
-/* 🚀 Botón CTA */
-.cta {
-  text-align: center;
-  margin-top: 2rem;
-}
-
-.btn-main {
-  background-color: var(--primary);
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  padding: 0.8rem 2rem;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
-}
-
-.btn-main:hover {
-  background-color: #2563eb;
-  transform: translateY(-2px);
+/* Colores de texto */
+.text-muted {
+  color: rgba(0, 0, 0, 0.65) !important;
 }
 </style>

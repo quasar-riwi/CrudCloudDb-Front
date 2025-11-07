@@ -1,92 +1,75 @@
 <template>
-  <div class="settings-page">
-    <h2 class="title">Configuración de la Cuenta</h2>
+  <div class="settings-page container py-5">
+    <h2 class="text-center mb-5 fw-bold fade-in">Configuración de la Cuenta</h2>
 
-    <div class="settings-container">
+    <div class="row g-4 justify-content-center">
 
       <!-- 🧍 Información del Perfil -->
-      <div class="card">
-        <h3>Información del Perfil</h3>
-        <form @submit.prevent="updateProfile" class="form">
-          <div class="form-group">
-            <label>Nombre</label>
-            <input type="text" v-model="user.nombre" class="form-control" />
-          </div>
+      <div class="col-md-4 fade-in-up">
+        <div class="card shadow-lg bg-dark text-white rounded-4 p-4 border-0 h-100">
+          <h4 class="mb-3">Información del Perfil</h4>
+          <form @submit.prevent="updateProfile" class="form">
+            <div class="mb-3">
+              <label class="form-label text-white">Nombre</label>
+              <input type="text" v-model="user.nombre" class="form-control bg-transparent text-white border-light" disabled />
+            </div>
 
-          <div class="form-group">
-            <label>Apellido</label>
-            <input type="text" v-model="user.apellido" class="form-control" />
-          </div>
+            <div class="mb-3">
+              <label class="form-label text-white">Apellido</label>
+              <input type="text" v-model="user.apellido" class="form-control bg-transparent text-white border-light" disabled />
+            </div>
 
-          <div class="form-group">
-            <label>Correo Electrónico</label>
-            <input type="email" v-model="user.correo" class="form-control" disabled />
-          </div>
-
-          <button type="submit" class="btn-primary">Guardar Cambios</button>
-        </form>
+            <div class="mb-3">
+              <label class="form-label text-white">Correo Electrónico</label>
+              <input type="email" v-model="user.correo" class="form-control bg-transparent text-white border-light" disabled />
+            </div>
+          </form>
+        </div>
       </div>
 
       <!-- 🔒 Cambiar Contraseña -->
-      <div class="card">
-        <h3>Seguridad</h3>
-        <form @submit.prevent="changePassword" class="form">
-          <div class="form-group">
-            <label>Contraseña Actual</label>
-            <input
-              type="password"
-              v-model="currentPassword"
-              class="form-control"
-              required
-            />
-          </div>
+      <div class="col-md-4 fade-in-up delay-1">
+        <div class="card shadow-lg bg-dark text-white rounded-4 p-4 border-0 h-100">
+          <h4 class="mb-3">Seguridad</h4>
+          <form @submit.prevent="changePassword" class="form">
+            <div class="mb-3">
+              <label class="form-label text-white">Contraseña Actual</label>
+              <input type="password" v-model="currentPassword" class="form-control bg-transparent text-white border-light" required />
+            </div>
 
-          <div class="form-group">
-            <label>Nueva Contraseña</label>
-            <input
-              type="password"
-              v-model="newPassword"
-              class="form-control"
-              required
-            />
-          </div>
+            <div class="mb-3">
+              <label class="form-label text-white">Nueva Contraseña</label>
+              <input type="password" v-model="newPassword" class="form-control bg-transparent text-white border-light" required />
+            </div>
 
-          <div class="form-group">
-            <label>Confirmar Nueva Contraseña</label>
-            <input
-              type="password"
-              v-model="confirmPassword"
-              class="form-control"
-              required
-            />
-          </div>
+            <div class="mb-4">
+              <label class="form-label text-white">Confirmar Nueva Contraseña</label>
+              <input type="password" v-model="confirmPassword" class="form-control bg-transparent text-white border-light" required />
+            </div>
 
-          <button type="submit" class="btn-primary" :disabled="loading">
-            {{ loading ? "Actualizando..." : "Actualizar Contraseña" }}
-          </button>
-        </form>
+            <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold" :disabled="loading">
+              {{ loading ? "Actualizando..." : "Actualizar Contraseña" }}
+            </button>
+          </form>
+        </div>
       </div>
 
       <!-- 💳 Plan Actual -->
-      <div class="card">
-        <h3>Plan Actual</h3>
-        <p class="plan-text">
-          Tu plan actual es:
-          <span class="plan-name">{{ user.plan || "Desconocido" }}</span>
-        </p>
-        <button class="btn-secondary" @click="$router.push('/dashboard/plans')">
-          Cambiar Plan
-        </button>
+      <div class="col-md-4 fade-in-up delay-2">
+        <div class="card shadow-lg bg-dark text-white rounded-4 p-4 border-0 h-100 d-flex flex-column justify-content-between">
+          <div>
+            <h4 class="mb-3">Plan Actual</h4>
+            <p class="fs-5">
+              Tu plan actual es:
+              <span class="fw-bold text-info">{{ user.plan || "Desconocido" }}</span>
+            </p>
+          </div>
+          <button class="btn btn-outline-info w-100 rounded-pill fw-bold mt-3" @click="$router.push('/dashboard/plans')">
+            Cambiar Plan
+          </button>
+        </div>
       </div>
 
-      <!-- ⚠️ Zona Peligrosa -->
-      <div class="card danger">
-        <h3>Zona Peligrosa</h3>
-        <p>¿Deseas eliminar tu cuenta? Esta acción no se puede deshacer.</p>
-        <button class="btn-danger" @click="deleteAccount">
-          Eliminar Cuenta
-        </button>
-      </div>
     </div>
   </div>
 </template>
@@ -96,12 +79,7 @@ import axios from "axios";
 
 export default {
   name: "Settings",
-  props: {
-    user: {
-      type: Object,
-      required: true,
-    },
-  },
+  props: { user: { type: Object, required: true } },
   data() {
     return {
       currentPassword: "",
@@ -114,22 +92,20 @@ export default {
     async updateProfile() {
       alert("Función para actualizar perfil aún no implementada.");
     },
-
     async changePassword() {
       if (this.newPassword !== this.confirmPassword) {
         alert("❌ Las contraseñas no coinciden.");
         return;
       }
-
       try {
         this.loading = true;
         const token = localStorage.getItem("token");
-
         const response = await axios.post(
           "http://localhost:5005/api/Users/change-password",
           {
             currentPassword: this.currentPassword,
             newPassword: this.newPassword,
+            confirmNewPassword: this.confirmPassword,
           },
           {
             headers: {
@@ -138,24 +114,19 @@ export default {
             },
           }
         );
-
-        if (response.status === 200) {
+        if (response.status === 200 && response.data.success) {
           alert("✅ Contraseña actualizada correctamente.");
           this.currentPassword = "";
           this.newPassword = "";
           this.confirmPassword = "";
+        } else {
+          alert(response.data.message || "❌ Error al cambiar la contraseña.");
         }
       } catch (error) {
         console.error("Error al cambiar la contraseña:", error);
-        alert("❌ Error al cambiar la contraseña.");
+        alert("❌ Error al cambiar la contraseña. Inténtalo de nuevo.");
       } finally {
         this.loading = false;
-      }
-    },
-
-    async deleteAccount() {
-      if (confirm("¿Seguro que deseas eliminar tu cuenta?")) {
-        alert("Función para eliminar cuenta aún no implementada.");
       }
     },
   },
@@ -164,134 +135,78 @@ export default {
 
 <style scoped>
 .settings-page {
+ 
   min-height: 100vh;
-  background-color: #f5f6fa;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 3rem 1rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  overflow: hidden; /* 🔹 evita scroll */
+  color: white;
+  animation: fadeIn 1s ease-in-out;
 }
 
-.title {
-  color: #1B4079;
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 2rem;
-}
-
-.settings-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: 2rem;
-  width: 100%;
-  max-width: 1100px;
-}
-
-/* Tarjeta general */
 .card {
-  background: #fff;
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
 }
 
 .card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
 }
 
-/* Zona peligrosa */
-.card.danger {
-  border: 2px solid #dc3545;
-}
-
-/* Formularios */
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-label {
-  font-weight: 600;
-  color: #1B4079;
-  margin-bottom: 0.3rem;
-}
-
-.form-control {
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  padding: 0.7rem;
-  font-size: 1rem;
+.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .form-control:focus {
-  outline: none;
-  border-color: #1B4079;
+  box-shadow: 0 0 10px rgba(0, 173, 255, 0.6);
+  border-color: #00aaff;
 }
 
-/* Botones */
 .btn-primary {
-  background-color: #1B4079;
-  color: white;
+  background: linear-gradient(90deg, #00aaff, #007bff);
   border: none;
-  border-radius: 12px;
-  padding: 0.8rem 1.2rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s;
 }
 
 .btn-primary:hover {
-  background-color: #2a5cb3;
+  background: linear-gradient(90deg, #007bff, #00aaff);
 }
 
-.btn-secondary {
-  background-color: transparent;
-  color: #1B4079;
-  border: 2px solid #1B4079;
-  border-radius: 12px;
-  padding: 0.8rem 1.2rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s;
+.fade-in {
+  opacity: 0;
+  transform: translateY(-15px);
+  animation: fadeIn 0.8s ease forwards;
 }
 
-.btn-secondary:hover {
-  background-color: #1B4079;
-  color: white;
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 1s ease forwards;
 }
 
-.btn-danger {
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 12px;
-  padding: 0.8rem 1.2rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s;
+.delay-1 {
+  animation-delay: 0.2s;
 }
 
-.btn-danger:hover {
-  background-color: #b02a37;
+.delay-2 {
+  animation-delay: 0.4s;
 }
 
-/* Texto de plan */
-.plan-text {
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.plan-name {
-  font-weight: bold;
-  color: #1B4079;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>
