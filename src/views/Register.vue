@@ -124,7 +124,7 @@
 <script>
 import axios from "axios";
 
-const API_URL = "http://service.quasar.andrescortes.dev/api/Users/register";
+const API_URL = "https://service.quasar.andrescortes.dev/api/Users/register";
 
 export default {
   name: "Register",
