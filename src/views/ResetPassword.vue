@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import api from "@/api";
+import { resetPassword } from "@/api/userApi";
 
 export default {
   name: "ResetPassword",
@@ -79,7 +79,7 @@ export default {
 
       try {
         this.loading = true;
-        const response = await api.post("/auth/reset-password", {
+        const response = await resetPassword({
           token,
           newPassword: this.newPassword,
         });
