@@ -86,13 +86,25 @@ export default {
         });
 
         // Puedes personalizar el mensaje según tu backend
-        if (response.status === 200) {
-          this.successMessage = "✅ Tu contraseña ha sido actualizada correctamente.";
+        if (response.status === 200 && response.data.success) {
+          // Mostrar mensaje debajo del botón (como en el registro)
+          this.successMessage =
+            response.data.message ||
+            "Contraseña restablecida exitosamente. Ya puedes iniciar sesión.";
+
+          // Limpiar los campos
           this.newPassword = "";
           this.confirmPassword = "";
+
+          // Redirigir al login después de 2.5 segundos
           setTimeout(() => {
             this.$router.push("/login");
           }, 2500);
+        } else {
+          // Si no hubo éxito, mostrar mensaje de error del backend
+          this.errorMessage =
+            response.data?.message ||
+            "No se pudo restablecer la contraseña. Intenta nuevamente.";
         }
       } catch (error) {
         console.error(error);
@@ -228,4 +240,27 @@ input:focus {
     transform: translateY(0);
   }
 }
+
+.success {
+  margin-top: 1rem;
+  color: #4ade80; /* verde suave */
+  font-size: 0.95rem;
+  font-weight: 500;
+  background: rgba(74, 222, 128, 0.1);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.error {
+  margin-top: 1rem;
+  color: #f87171; /* rojo suave */
+  font-size: 0.95rem;
+  font-weight: 500;
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  border-radius: 8px;
+  padding: 10px;
+}
+
 </style>
