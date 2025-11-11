@@ -154,6 +154,8 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .table-header h4 {
@@ -183,6 +185,7 @@ export default {
 .database-table {
   width: 100%;
   border-collapse: collapse;
+  overflow-x: auto;
 }
 
 .database-table th,
@@ -191,6 +194,7 @@ export default {
   text-align: left;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   font-size: 0.95rem;
+  white-space: nowrap;
 }
 
 .database-table th {
@@ -247,5 +251,73 @@ export default {
   text-align: center;
   color: #a0a8c3;
   padding: 2rem;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 992px) {
+  .databases-view {
+    padding: 1.5rem;
+  }
+
+  .header h2 {
+    font-size: 1.6rem;
+  }
+
+  .header p {
+    font-size: 0.95rem;
+  }
+
+  .summary {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .btn-main {
+    width: 100%;
+  }
+
+  .table-section {
+    padding: 1rem;
+  }
+
+  .table-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .database-table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 576px) {
+  .summary {
+    grid-template-columns: 1fr;
+  }
+
+  .header h2 {
+    font-size: 1.4rem;
+    text-align: center;
+  }
+
+  .header p {
+    text-align: center;
+    font-size: 0.9rem;
+  }
+
+  .table-header h4 {
+    font-size: 1.1rem;
+  }
+
+  .database-table th,
+  .database-table td {
+    font-size: 0.85rem;
+    padding: 0.6rem;
+  }
+
+  .btn-main {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+  }
 }
 </style>
