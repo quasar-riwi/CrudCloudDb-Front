@@ -1,8 +1,10 @@
 <template>
   <div class="dashboard text-white">
+    <!-- BOTÓN HAMBURGER -->
+    <button class="toggle-btn" @click="toggleSidebar">☰</button>
 
     <!-- SIDEBAR -->
-    <aside class="sidebar shadow-lg">
+    <aside class="sidebar shadow-lg" :class="{ collapsed: isCollapsed }">
       <div class="logo fade-down">
         <a
           class="navbar-brand d-flex align-items-center justify-content-center text-white fw-bold"
@@ -30,7 +32,8 @@
       </div>
     </aside>
 
-    <main class="content">
+    <!-- CONTENIDO -->
+    <main class="content" :class="{ expanded: isCollapsed }">
       <section class="main-content fade-up">
         <router-view :user="user" />
       </section>
@@ -50,52 +53,56 @@ export default {
     return {
       user: null,
       error: "",
+      isCollapsed: false,
     };
   },
   async created() {
     await this.getUserInfo();
   },
   methods: {
+    toggleSidebar() {
+      this.isCollapsed = !this.isCollapsed;
+    },
     logout() {
       localStorage.removeItem("token");
       this.$router.push("/login");
     },
-async getUserInfo() {
-  try {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      this.error = "No hay token. Inicia sesión.";
-      this.$router.push("/login");
-      return;
-    }
+    async getUserInfo() {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          this.error = "No hay token. Inicia sesión.";
+          this.$router.push("/login");
+          return;
+        }
 
-    const decoded = jwtDecode.jwtDecode(token);
-    const userId =
-      decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
-    if (!userId) {
-      this.error = "No se pudo obtener el ID del usuario desde el token.";
-      return;
-    }
+        const decoded = jwtDecode.jwtDecode(token);
+        const userId =
+          decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+        if (!userId) {
+          this.error = "No se pudo obtener el ID del usuario desde el token.";
+          return;
+        }
 
-    const response = await axios.get(`${API_URL}/${userId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-      withCredentials: true, // 🔥 importante si usas cookies o CORS con credenciales
-    });
+        const response = await axios.get(`${API_URL}/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        });
 
-    this.user = response.data.data;
-  } catch (error) {
-    if (error.response) {
-      console.error("Error del servidor:", error.response.status, error.response.data);
-      this.error = `Error ${error.response.status}: ${error.response.data.message}`;
-    } else if (error.request) {
-      console.error("No se recibió respuesta del servidor:", error.request);
-      this.error = "No se pudo conectar al servidor.";
-    } else {
-      console.error("Error desconocido:", error.message);
-      this.error = "Error inesperado.";
-    }
-  }
-},
+        this.user = response.data.data;
+      } catch (error) {
+        if (error.response) {
+          console.error("Error del servidor:", error.response.status, error.response.data);
+          this.error = `Error ${error.response.status}: ${error.response.data.message}`;
+        } else if (error.request) {
+          console.error("No se recibió respuesta del servidor:", error.request);
+          this.error = "No se pudo conectar al servidor.";
+        } else {
+          console.error("Error desconocido:", error.message);
+          this.error = "Error inesperado.";
+        }
+      }
+    },
     goToDashboard() {
       this.$router.push("/dashboard/home");
     },
@@ -121,6 +128,16 @@ async getUserInfo() {
   justify-content: space-between;
   padding: 1.5rem 0;
   box-shadow: 3px 0 10px rgba(0, 0, 0, 0.6);
+  transition: all 0.3s ease;
+}
+
+.sidebar.collapsed {
+  transform: translateX(-100%);
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  z-index: 2000;
 }
 
 .logo-img {
@@ -192,6 +209,11 @@ async getUserInfo() {
   background-color: #0e0e1c;
   padding: 0;
   overflow-y: auto;
+  transition: margin-left 0.3s ease;
+}
+
+.content.expanded {
+  margin-left: 0 !important;
 }
 
 .main-content {
@@ -199,6 +221,26 @@ async getUserInfo() {
   color: white;
   min-height: 100vh;
   animation: fadeUp 1s ease forwards;
+}
+
+/* === BOTÓN HAMBURGER === */
+.toggle-btn {
+  display: none;
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  background: rgba(25, 25, 50, 0.9);
+  color: white;
+  border: none;
+  font-size: 1.5rem;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  z-index: 3000;
+  transition: background 0.3s ease;
+}
+.toggle-btn:hover {
+  background: rgba(77, 124, 138, 0.4);
 }
 
 /* === ANIMACIONES === */
@@ -225,15 +267,26 @@ async getUserInfo() {
   }
 }
 
-/* === SCROLLBAR PERSONALIZADO === */
-.content::-webkit-scrollbar {
-  width: 8px;
-}
-.content::-webkit-scrollbar-thumb {
-  background: rgba(77, 124, 138, 0.5);
-  border-radius: 10px;
-}
-.content::-webkit-scrollbar-thumb:hover {
-  background: rgba(77, 124, 138, 0.8);
+/* === RESPONSIVE === */
+@media (max-width: 992px) {
+  .toggle-btn {
+    display: block;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    z-index: 2000;
+  }
+
+  .content {
+    margin-left: 0;
+  }
+
+  .main-content {
+    padding: 20px;
+  }
 }
 </style>
