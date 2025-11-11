@@ -337,7 +337,7 @@ export default {
         },
         {
           name: "Intermedio",
-          price: "$50",
+          price: "$5.000",
           description: "Ideal para startups y aplicaciones en crecimiento",
           badge: "Popular",
           popular: true,
@@ -352,7 +352,7 @@ export default {
         },
         {
           name: "Avanzado",
-          price: "$100",
+          price: "$10.000",
           description: "Para empresas con aplicaciones críticas",
           badge: "Pro",
           popular: false,
