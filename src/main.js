@@ -1,6 +1,7 @@
-
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
+import "remixicon/fonts/remixicon.css";
+import 'bootstrap'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'

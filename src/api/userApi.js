@@ -49,13 +49,26 @@ export const loginUser = async (credentials) => {
   }
 };
 
-// =======================================================
-// ⚙️ Configuración general de axios (opcional)
-// =======================================================
-// Si en el futuro quieres manejar JWT automáticamente, puedes hacerlo así:
-//
-// axios.interceptors.request.use((config) => {
-//   const token = localStorage.getItem("jwtToken");
-//   if (token) config.headers.Authorization = `Bearer ${token}`;
-//   return config;
-// });
+export const forgotPassword = async (payload) => {
+  try {
+    const response = await axios.post(`${API_URL}/forgot-password`, payload);
+    return response.data;
+  } catch (error) {
+    console.error("Error en forgotPassword:", error);
+    throw new Error(
+      error.response?.data?.message || "Error al enviar el correo de recuperación"
+    );
+  }
+};
+
+export const resetPassword = async (payload) => {
+  try {
+    const response = await axios.post(`${API_URL}/reset-password`, payload);
+    return response.data;
+  } catch (error) {
+    console.error("Error en resetPassword:", error);
+    throw new Error(
+      error.response?.data?.message || "Error al restablecer la contraseña"
+    );
+  }
+};
