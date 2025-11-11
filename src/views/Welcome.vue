@@ -291,7 +291,7 @@ export default {
         {
           number: "01",
           title: "Elige tu motor",
-          description: "Selecciona entre una variedad de bases de datos SQL y NoSQL populares: PostgreSQL, MySQL, MongoDB, Redis y más.",
+          description: "Selecciona entre una variedad de bases de datos SQL y NoSQL populares: PostgreSQL, MySQL, MongoDB y más.",
           icon: "fas fa-database fa-2x"
         },
         {

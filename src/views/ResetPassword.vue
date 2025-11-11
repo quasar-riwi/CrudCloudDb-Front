@@ -85,32 +85,29 @@ export default {
           confirmPassword: this.confirmPassword
         });
 
-        // Puedes personalizar el mensaje según tu backend
-        if (response.status === 200 && response.data.success) {
-          // Mostrar mensaje debajo del botón (como en el registro)
-          this.successMessage =
-            response.data.message ||
-            "Contraseña restablecida exitosamente. Ya puedes iniciar sesión.";
+        // ✅ Accede directamente al contenido del backend
+        const { success, message } = response.data || {};
 
-          // Limpiar los campos
+        if (success) {
+          this.successMessage =
+            message || "Contraseña restablecida exitosamente. Ya puedes iniciar sesión.";
+          this.errorMessage = "";
           this.newPassword = "";
           this.confirmPassword = "";
 
-          // Redirigir al login después de 2.5 segundos
           setTimeout(() => {
             this.$router.push("/login");
           }, 2500);
         } else {
-          // Si no hubo éxito, mostrar mensaje de error del backend
-          this.errorMessage =
-            response.data?.message ||
-            "No se pudo restablecer la contraseña. Intenta nuevamente.";
+          // Si el backend respondió pero no con success=true
+          this.errorMessage = message || "No se pudo restablecer la contraseña. Intenta nuevamente.";
         }
+
       } catch (error) {
-        console.error(error);
+        console.error("Error en resetPassword:", error);
         this.errorMessage =
           error.response?.data?.message ||
-          "❌ No se pudo actualizar la contraseña. Intenta de nuevo.";
+          "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
       } finally {
         this.loading = false;
       }
