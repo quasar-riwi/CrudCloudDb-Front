@@ -9,11 +9,11 @@
     <section class="summary">
       <div class="summary-card">
         <h6>Total de Bases de Datos</h6>
-        <h3>6</h3>
+        <h3>{{ databases.length }}</h3>
       </div>
       <div class="summary-card">
         <h6>Disponibles</h6>
-        <h3>12</h3>
+        <h3>{{ databases.filter(db => db.status === 'active').length }}</h3>
       </div>
       <div class="summary-card">
         <h6>Motor más usado</h6>
@@ -24,7 +24,7 @@
     <section class="table-section">
       <div class="table-header">
         <h4>Instancias Activas</h4>
-        <button class="btn-main">+ Nueva Base de Datos</button>
+        <button class="btn-main" @click="showModal = true">+ Nueva Base de Datos</button>
       </div>
 
       <table class="database-table">
@@ -59,20 +59,106 @@
         <p>No tienes bases de datos creadas aún.</p>
       </div>
     </section>
+
+    <!-- === MODAL === -->
+    <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
+      <div class="modal-box">
+        <!-- Cargando -->
+        <div v-if="isLoading" class="loading-container">
+          <div class="spinner"></div>
+          <p>Creando instancia...</p>
+        </div>
+
+        <!-- Selección de motor -->
+        <template v-else>
+          <h3>Selecciona el motor</h3>
+          <div class="modal-options">
+            <button
+              v-for="engine in engines"
+              :key="engine"
+              class="modal-btn"
+              @click="createDatabase(engine)"
+            >
+              {{ engine }}
+            </button>
+          </div>
+          <button class="modal-cancel" @click="showModal = false">Cancelar</button>
+        </template>
+      </div>
+    </div>
+
+    <!-- ✅ Toast -->
+    <transition name="fade">
+      <div v-if="toastMessage" class="toast">{{ toastMessage }}</div>
+    </transition>
   </div>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "Databases",
   data() {
     return {
+      apiUrl: "https://service.quasar.andrescortes.dev/api/DatabaseInstances",
       databases: [
         { name: "ccd_userdb", engine: "MySQL", status: "active", created: "2025-10-20" },
         { name: "ccd_logs", engine: "PostgreSQL", status: "active", created: "2025-10-21" },
         { name: "ccd_cache", engine: "Redis", status: "inactive", created: "2025-10-22" },
       ],
+      showModal: false,
+      isLoading: false, // 🔹 Estado de carga
+      toastMessage: "", // 🔹 Mensaje flotante
+      engines: ["PostgreSQL", "MySQL", "MongoDB", "SQLServer"],
+      userId: 1,
     };
+  },
+  methods: {
+    async createDatabase(engine) {
+      try {
+        this.isLoading = true;
+        const token = localStorage.getItem("token");
+        if (!token) {
+          this.showToast("⚠️ No hay token. Inicia sesión nuevamente.");
+          this.isLoading = false;
+          return;
+        }
+
+        const payload = {
+          motor: engine,
+          usuarioId: this.userId,
+        };
+
+        const response = await axios.post(this.apiUrl, payload, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const newDb = {
+          name: response.data.nombre || `ccd_${engine.toLowerCase()}`,
+          engine: response.data.motor || engine,
+          status: "active",
+          created: new Date().toISOString().split("T")[0],
+        };
+
+        this.databases.push(newDb);
+        this.showModal = false;
+        this.showToast(`✅ Base de datos ${engine} creada correctamente.`);
+      } catch (error) {
+        console.error("Error al crear la base de datos:", error);
+        if (error.response?.status === 401) {
+          this.showToast("⚠️ No autorizado. Inicia sesión nuevamente.");
+        } else {
+          this.showToast("❌ Ocurrió un error al crear la base de datos.");
+        }
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    showToast(message) {
+      this.toastMessage = message;
+      setTimeout(() => (this.toastMessage = ""), 3000);
+    },
   },
 };
 </script>
@@ -253,26 +339,129 @@ export default {
   padding: 2rem;
 }
 
+/* === MODAL === */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 20, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-box {
+  background: #15182a;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  border: 1px solid rgba(79, 140, 255, 0.3);
+  box-shadow: 0 0 25px rgba(79, 140, 255, 0.2);
+  max-width: 400px;
+  width: 90%;
+}
+
+.modal-box h3 {
+  color: #4f8cff;
+  margin-bottom: 1.5rem;
+}
+
+.modal-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.modal-btn {
+  background: linear-gradient(90deg, #0d47a1, #1b74ff);
+  color: white;
+  border: none;
+  padding: 0.7rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.modal-btn:hover {
+  transform: scale(1.05);
+  background: linear-gradient(90deg, #1b74ff, #4f8cff);
+}
+
+.modal-cancel {
+  margin-top: 1.5rem;
+  background: none;
+  color: #a0a8c3;
+  border: 1px solid rgba(160, 168, 195, 0.3);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.modal-cancel:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+/* === LOADING === */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top: 4px solid #4f8cff;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* === TOAST === */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: linear-gradient(90deg, #0d47a1, #1b74ff);
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(79, 140, 255, 0.4);
+  font-weight: 600;
+  z-index: 1000;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
 /* === RESPONSIVE === */
 @media (max-width: 992px) {
   .databases-view {
     padding: 1.5rem;
   }
 
-  .header h2 {
-    font-size: 1.6rem;
-  }
-
-  .header p {
-    font-size: 0.95rem;
-  }
-
   .summary {
     grid-template-columns: 1fr 1fr;
-  }
-
-  .btn-main {
-    width: 100%;
   }
 
   .table-section {
@@ -283,11 +472,6 @@ export default {
     flex-direction: column;
     align-items: flex-start;
   }
-
-  .database-table {
-    display: block;
-    overflow-x: auto;
-  }
 }
 
 @media (max-width: 576px) {
@@ -295,29 +479,8 @@ export default {
     grid-template-columns: 1fr;
   }
 
-  .header h2 {
-    font-size: 1.4rem;
-    text-align: center;
-  }
-
-  .header p {
-    text-align: center;
-    font-size: 0.9rem;
-  }
-
-  .table-header h4 {
-    font-size: 1.1rem;
-  }
-
-  .database-table th,
-  .database-table td {
-    font-size: 0.85rem;
-    padding: 0.6rem;
-  }
-
-  .btn-main {
-    font-size: 0.9rem;
-    padding: 0.5rem 1rem;
+  .modal-options {
+    grid-template-columns: 1fr;
   }
 }
 </style>
