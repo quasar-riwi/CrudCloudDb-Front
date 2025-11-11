@@ -61,9 +61,13 @@ export const forgotPassword = async (payload) => {
   }
 };
 
-export const resetPassword = async (payload) => {
+export const resetPassword = async ({ token, newPassword }) => {
   try {
-    const response = await axios.post(`${API_URL}/reset-password`, payload);
+    const response = await axios.post(`${API_URL}/reset-password`, {
+      token,
+      newPassword,
+      confirmPassword: newPassword
+    });
     return response.data;
   } catch (error) {
     console.error("Error en resetPassword:", error);
@@ -72,3 +76,4 @@ export const resetPassword = async (payload) => {
     );
   }
 };
+
