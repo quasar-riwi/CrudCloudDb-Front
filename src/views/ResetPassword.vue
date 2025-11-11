@@ -70,7 +70,6 @@ export default {
         return;
       }
 
-      // Obtenemos el token del query param ?token=XXXX
       const token = this.$route.query.token;
       if (!token) {
         this.errorMessage = "El enlace de recuperación no es válido o ha expirado.";
@@ -85,8 +84,7 @@ export default {
           confirmPassword: this.confirmPassword
         });
 
-        // ✅ Accede directamente al contenido del backend
-        const { success, message } = response.data || {};
+        const { success, message } = response;
 
         if (success) {
           this.successMessage =
@@ -99,7 +97,6 @@ export default {
             this.$router.push("/login");
           }, 2500);
         } else {
-          // Si el backend respondió pero no con success=true
           this.errorMessage = message || "No se pudo restablecer la contraseña. Intenta nuevamente.";
         }
 
