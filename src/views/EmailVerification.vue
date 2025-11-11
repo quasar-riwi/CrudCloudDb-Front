@@ -1,67 +1,35 @@
 <template>
-  <div class="verify-page bg-dark text-white d-flex flex-column min-vh-100">
+  <div class="verify-container">
+    <div class="verify-card">
 
-    <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg py-3 shadow-sm" style="background-color: #0a0a17;">
-      <div class="container">
-        <a class="navbar-brand d-flex align-items-center text-white fw-bold" href="#">
-          <img src="@/assets/logo.png" alt="CrudCloud" height="40" class="me-2" />
-          CrudCloud
-        </a>
+      <!-- Estado de carga -->
+      <div v-if="loading" class="verify-state">
+        <div class="spinner"></div>
+        <p class="text">Verificando tu correo, por favor espera...</p>
       </div>
-    </nav>
 
-    <!-- CONTENIDO -->
-    <section class="flex-grow-1 d-flex align-items-center justify-content-center">
-      <div
-        class="card text-center shadow-lg border-0 p-4"
-        style="max-width: 500px; width: 100%; background-color: #181826; border-radius: 20px;"
-      >
-
-        <!-- Estado de carga -->
-        <div v-if="loading" class="my-5">
-          <div class="spinner-border text-primary" role="status"></div>
-          <p class="mt-3 mb-0 text-light-emphasis fw-semibold">
-            Verificando tu correo, por favor espera...
-          </p>
-        </div>
-
-        <!-- Éxito -->
-        <div v-else-if="success" class="my-5">
-          <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
-          <h4 class="mt-3 fw-bold text-primary">¡Correo verificado exitosamente!</h4>
-          <p class="text-light-emphasis mb-3">Ya puedes iniciar sesión en tu cuenta.</p>
-          <router-link
-            to="/login"
-            class="btn btn-primary rounded-pill px-4 fw-semibold"
-          >
-            Ir al login
-          </router-link>
-        </div>
-
-        <!-- Error -->
-        <div v-else class="my-5">
-          <i class="bi bi-x-circle-fill text-danger" style="font-size: 3rem;"></i>
-          <h4 class="mt-3 fw-bold text-primary">Error al verificar el correo</h4>
-          <p class="text-light-emphasis">{{ message }}</p>
-          <router-link
-            to="/"
-            class="btn btn-outline-danger rounded-pill px-4 fw-semibold"
-          >
-            Volver al inicio
-          </router-link>
-        </div>
-
+      <!-- Éxito -->
+      <div v-else-if="success" class="verify-state">
+        <i class="bi bi-check-circle-fill icon success"></i>
+        <h2 class="title">¡Correo verificado exitosamente!</h2>
+        <p class="subtitle">Ya puedes iniciar sesión en tu cuenta.</p>
+        <router-link
+          to="/login"
+          class="btn btn-futuristic w-100 fw-semibold py-2 mt-3 text-center d-inline-block"
+        >
+          Ir al inicio de sesión
+        </router-link>
       </div>
-    </section>
 
-    <!-- FOOTER -->
-    <footer class="text-center py-3" style="background-color: #0a0a17;">
-      <small class="text-light-emphasis">
-        © 2025 CrudCloud — Todos los derechos reservados.
-      </small>
-    </footer>
+      <!-- Error -->
+      <div v-else class="verify-state">
+        <i class="bi bi-x-circle-fill icon error"></i>
+        <h2 class="title">Error al verificar el correo</h2>
+        <p class="subtitle">{{ message }}</p>
+        <router-link to="/" class="btn-outline">Volver al inicio</router-link>
+      </div>
 
+    </div>
   </div>
 </template>
 
@@ -83,17 +51,18 @@ export default {
     if (!token) {
       this.loading = false;
       this.success = false;
-      this.message = "Token no proporcionado.";
+      this.message = "El enlace de verificación no es válido o ha expirado.";
       return;
     }
 
     try {
       const response = await verifyEmail(token);
       this.success = true;
-      this.message = response?.message || "Verificación completada.";
+      this.message = response?.message || "Verificación completada correctamente.";
     } catch (error) {
       this.success = false;
-      this.message = error.message || "No se pudo verificar el correo.";
+      this.message =
+        error.response?.data?.message || "No se pudo verificar el correo electrónico.";
     } finally {
       this.loading = false;
     }
@@ -102,37 +71,128 @@ export default {
 </script>
 
 <style scoped>
-.verify-page {
-  background: radial-gradient(ellipse at center, #111122 0%, #0a0a17 100%);
-  color: white;
+/* === Fondo general === */
+.verify-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at top, #0a0f1f, #050a18);
+  font-family: "Poppins", sans-serif;
+  color: #fff;
 }
 
-.card {
-  border-radius: 1.5rem;
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
-}
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 0 20px rgba(0, 123, 255, 0.25);
+/* === Tarjeta principal === */
+.verify-card {
+  background: rgba(17, 25, 40, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 2.5rem;
+  width: 420px;
+  text-align: center;
+  box-shadow: 0 0 25px rgba(0, 200, 255, 0.2);
+  animation: fadeIn 1s ease;
 }
 
-/* Animación de entrada */
-section {
-  animation: fadeInUp 0.8s ease both;
+/* === Estados (loading, éxito, error) === */
+.verify-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-@keyframes fadeInUp {
+
+.icon {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+}
+.icon.success {
+  color: #00ffae;
+}
+.icon.error {
+  color: #ff3d71;
+}
+
+/* === Tipografía === */
+.title {
+  font-size: 1.6rem;
+  font-weight: 600;
+  background: linear-gradient(90deg, #00d9ff, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: #94a3b8;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  max-width: 320px;
+}
+
+/* === Botones === */
+.btn-primary,
+.btn-outline {
+  display: inline-block;
+  width: 100%;
+  padding: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, #00d9ff, #8b5cf6);
+  color: #fff;
+  border: none;
+}
+.btn-primary:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 20px #00d9ff;
+}
+
+.btn-outline {
+  color: #ff3d71;
+  border: 1px solid #ff3d71;
+  background: transparent;
+}
+.btn-outline:hover {
+  background: rgba(255, 61, 113, 0.1);
+  transform: scale(1.03);
+}
+
+/* === Animaciones === */
+.spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top: 3px solid #00d9ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1.5rem;
+}
+
+.text {
+  color: #94a3b8;
+  font-size: 0.95rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(40px);
+    transform: translateY(15px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-/* Texto sutil */
-.text-light-emphasis {
-  color: rgba(255, 255, 255, 0.6) !important;
 }
 </style>

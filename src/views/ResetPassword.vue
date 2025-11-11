@@ -82,6 +82,7 @@ export default {
         const response = await resetPassword({
           token,
           newPassword: this.newPassword,
+          confirmPassword: this.confirmPassword
         });
 
         // Puedes personalizar el mensaje según tu backend
