@@ -11,10 +11,7 @@
         <h6>Total de Bases de Datos</h6>
         <h3>{{ databases.length }}</h3>
       </div>
-      <div class="summary-card">
-        <h6>Disponibles</h6>
-        <h3>{{ databases.filter(db => db.status === 'active').length }}</h3>
-      </div>
+
       <div class="summary-card">
         <h6>Motor más usado</h6>
         <h3>PostgreSQL</h3>
@@ -32,7 +29,6 @@
           <tr>
             <th>Nombre</th>
             <th>Motor</th>
-
             <th>Creada</th>
             <th>Acciones</th>
           </tr>
@@ -41,11 +37,10 @@
           <tr v-for="(db, index) in databases" :key="index">
             <td>{{ db.name }}</td>
             <td>{{ db.engine }}</td>
-            
             <td>{{ db.created }}</td>
             <td class="actions">
-              
-              <button class="btn-delete" @click="deleteDatabase(db)">Eliminar</button>
+              <button class="btn-delete" @click="confirmDelete(db)">Eliminar</button>
+
             </td>
           </tr>
         </tbody>
@@ -69,12 +64,7 @@
         <template v-else>
           <h3>Selecciona el motor</h3>
           <div class="modal-options">
-            <button
-              v-for="engine in engines"
-              :key="engine"
-              class="modal-btn"
-              @click="createDatabase(engine)"
-            >
+            <button v-for="engine in engines" :key="engine" class="modal-btn" @click="createDatabase(engine)">
               {{ engine }}
             </button>
           </div>
@@ -82,6 +72,25 @@
         </template>
       </div>
     </div>
+
+    <!-- === MODAL CONFIRMAR ELIMINACIÓN === -->
+    <div v-if="showConfirmModal" class="modal-overlay" @click.self="showConfirmModal = false">
+      <div class="modal-box">
+        <h3 style="color: #ef4444;">¿Eliminar base de datos?</h3>
+        <p style="color: #a0a8c3; margin-bottom: 1rem;">
+          Estás a punto de eliminar <strong>{{ dbToDelete?.name }}</strong>.
+          Esta acción no se puede deshacer.
+        </p>
+        <div class="modal-options">
+          <button class="btn btn-danger" 
+            @click="deleteDatabase">
+            Sí, eliminar
+          </button>
+          <button class="btn btn-secondary" @click="showConfirmModal = false">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
 
     <!-- ✅ Toast -->
     <transition name="fade">
@@ -103,6 +112,8 @@ export default {
       isLoading: false,
       toastMessage: "",
       engines: ["PostgreSQL", "MySQL", "MongoDB", "SQLServer"],
+      showConfirmModal: false,
+      dbToDelete: null,
     };
   },
   async mounted() {
@@ -122,7 +133,6 @@ export default {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        // 🔸 Ajusta las propiedades según lo que devuelva tu backend
         this.databases = response.data.map((db) => ({
           name: db.nombre || db.name,
           engine: db.motor || db.engine,
@@ -134,56 +144,52 @@ export default {
         }));
       } catch (error) {
         console.error("Error al obtener las bases de datos:", error);
-        this.showToast("No se pudieron cargar las instancias.");
+        this.showToast("❌ No se pudieron cargar las instancias.");
       }
     },
 
     // 🔹 Crear nueva instancia
-   async createDatabase(engine) {
-  try {
-    this.isLoading = true;
-    const token = localStorage.getItem("token");
-    if (!token) {
-      this.showToast("⚠️ No hay token. Inicia sesión nuevamente.");
-      this.isLoading = false;
-      return;
-    }
+    async createDatabase(engine) {
+      try {
+        this.isLoading = true;
+        const token = localStorage.getItem("token");
+        if (!token) {
+          this.showToast("⚠️ No hay token. Inicia sesión nuevamente.");
+          this.isLoading = false;
+          return;
+        }
 
-    const payload = { motor: engine };
-    const response = await axios.post(this.apiUrl, payload, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+        const payload = { motor: engine };
+        const response = await axios.post(this.apiUrl, payload, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-    // ✅ Crear objeto de la nueva DB
-    const newDb = {
-      id: response.data.id || response.data.databaseInstanceId,
-      name: response.data.nombre || `ccd_${engine.toLowerCase()}`,
-      engine: response.data.motor || engine,
-      status: "active",
-      created: new Date().toISOString().split("T")[0],
-    };
+        const newDb = {
+          id: response.data.id || response.data.databaseInstanceId,
+          name: response.data.nombre || `ccd_${engine.toLowerCase()}`,
+          engine: response.data.motor || engine,
+          status: "active",
+          created: new Date().toISOString().split("T")[0],
+        };
 
-    this.databases.push(newDb);
-    this.showModal = false;
+        this.databases.push(newDb);
+        this.showModal = false;
+        this.showToast(`✅ Base de datos ${newDb.name} creada correctamente.`);
+      } catch (error) {
+        console.error("Error al crear la base de datos:", error);
+        const msg =
+          error.response?.data?.message ||
+          "❌ Ocurrió un error al crear la base de datos.";
+        this.showToast(msg);
+      } finally {
+        this.isLoading = false;
+      }
+    },
 
-    // ✅ Mensaje de éxito
-    this.showToast(`✅ Base de datos ${newDb.name} creada correctamente.`);
-  } catch (error) {
-    console.error("Error al crear la base de datos:", error);
-
-    // ❌ Mensaje de error más detallado
-    const msg =
-      error.response?.data?.message ||
-      " Ocurrió un error al crear la base de datos.";
-    this.showToast(msg);
-  } finally {
-    this.isLoading = false;
-  }
-},
-
-    // 🔹 Eliminar instancia
+    // 🔹 Eliminar instancia (versión definitiva)
     async deleteDatabase(db) {
-      if (!confirm(`¿Eliminar la base de datos "${db.name}"?`)) return;
+      const confirmDelete = confirm(`¿Eliminar la base de datos "${db.name}"?`);
+      if (!confirmDelete) return;
 
       try {
         const token = localStorage.getItem("token");
@@ -192,15 +198,61 @@ export default {
           return;
         }
 
-        await axios.delete(`${this.apiUrl}/${db.id}`, {
+        // ✅ Enviar solicitud DELETE al backend
+        const response = await axios.delete(`${this.apiUrl}/${db.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        this.databases = this.databases.filter((d) => d.id !== db.id);
-        this.showToast(`🗑️ "${db.name}" eliminada correctamente.`);
+        if (response.status === 200 || response.status === 204) {
+          // ✅ Actualizar la lista local
+          this.databases = this.databases.filter((d) => d.id !== db.id);
+          this.showToast(`🗑️ "${db.name}" eliminada correctamente.`);
+        } else {
+          this.showToast("❌ No se pudo eliminar la base de datos.");
+        }
       } catch (error) {
         console.error("Error al eliminar la base de datos:", error);
-        this.showToast("❌ No se pudo eliminar la base de datos.");
+        const msg =
+          error.response?.data?.message ||
+          "❌ No se pudo eliminar la base de datos. Inténtalo más tarde.";
+        this.showToast(msg);
+      }
+    },
+    confirmDelete(db) {
+      this.dbToDelete = db;
+      this.showConfirmModal = true;
+    },
+
+    async deleteDatabase() {
+      if (!this.dbToDelete) return;
+      const db = this.dbToDelete;
+      this.showConfirmModal = false;
+
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          this.showToast("⚠️ No hay token. Inicia sesión nuevamente.");
+          return;
+        }
+
+        const response = await axios.delete(`${this.apiUrl}/${db.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (response.status === 200 || response.status === 204) {
+          this.databases = this.databases.filter((d) => d.id !== db.id);
+          this.showToast(`🗑️ "${db.name}" eliminada correctamente.`);
+        } else {
+          this.showToast("❌ No se pudo eliminar la base de datos.");
+        }
+      } catch (error) {
+        console.error("Error al eliminar la base de datos:", error);
+        const msg =
+          error.response?.data?.message ||
+          "❌ No se pudo eliminar la base de datos. Inténtalo más tarde.";
+        this.showToast(msg);
+      } finally {
+        this.dbToDelete = null;
       }
     },
 
@@ -214,6 +266,8 @@ export default {
 </script>
 
 <style scoped>
+
+
 .databases-view {
   background: linear-gradient(180deg, #0b0e1a 0%, #101223 100%);
   min-height: 100vh;
@@ -499,6 +553,7 @@ export default {
 .fade-leave-active {
   transition: opacity 0.5s;
 }
+
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
