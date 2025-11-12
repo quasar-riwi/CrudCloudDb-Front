@@ -27,12 +27,12 @@
         <button class="btn-main" @click="showModal = true">+ Nueva Base de Datos</button>
       </div>
 
-      <table class="database-table">
+      <table class="database-table" v-if="databases.length > 0">
         <thead>
           <tr>
             <th>Nombre</th>
             <th>Motor</th>
-            <th>Estado</th>
+
             <th>Creada</th>
             <th>Acciones</th>
           </tr>
@@ -41,21 +41,17 @@
           <tr v-for="(db, index) in databases" :key="index">
             <td>{{ db.name }}</td>
             <td>{{ db.engine }}</td>
-            <td>
-              <span :class="['status', db.status]">
-                {{ db.status === 'active' ? '🟢 Activa' : '🔴 Inactiva' }}
-              </span>
-            </td>
+            
             <td>{{ db.created }}</td>
             <td class="actions">
-              <button class="btn-view">Ver</button>
-              <button class="btn-delete">Eliminar</button>
+              
+              <button class="btn-delete" @click="deleteDatabase(db)">Eliminar</button>
             </td>
           </tr>
         </tbody>
       </table>
 
-      <div v-if="databases.length === 0" class="empty">
+      <div v-else class="empty">
         <p>No tienes bases de datos creadas aún.</p>
       </div>
     </section>
@@ -102,59 +98,113 @@ export default {
   data() {
     return {
       apiUrl: "https://service.quasar.andrescortes.dev/api/DatabaseInstances",
-      databases: [
-        { name: "ccd_userdb", engine: "MySQL", status: "active", created: "2025-10-20" },
-        { name: "ccd_logs", engine: "PostgreSQL", status: "active", created: "2025-10-21" },
-        { name: "ccd_cache", engine: "Redis", status: "inactive", created: "2025-10-22" },
-      ],
+      databases: [],
       showModal: false,
-      isLoading: false, // 🔹 Estado de carga
-      toastMessage: "", // 🔹 Mensaje flotante
+      isLoading: false,
+      toastMessage: "",
       engines: ["PostgreSQL", "MySQL", "MongoDB", "SQLServer"],
-      userId: 1,
     };
   },
+  async mounted() {
+    await this.fetchDatabases();
+  },
   methods: {
-    async createDatabase(engine) {
+    // 🔹 Obtener las instancias del usuario autenticado
+    async fetchDatabases() {
       try {
-        this.isLoading = true;
         const token = localStorage.getItem("token");
         if (!token) {
           this.showToast("⚠️ No hay token. Inicia sesión nuevamente.");
-          this.isLoading = false;
           return;
         }
 
-        const payload = {
-          motor: engine,
-          usuarioId: this.userId,
-        };
-
-        const response = await axios.post(this.apiUrl, payload, {
+        const response = await axios.get(this.apiUrl, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        const newDb = {
-          name: response.data.nombre || `ccd_${engine.toLowerCase()}`,
-          engine: response.data.motor || engine,
-          status: "active",
-          created: new Date().toISOString().split("T")[0],
-        };
-
-        this.databases.push(newDb);
-        this.showModal = false;
-        this.showToast(`✅ Base de datos ${engine} creada correctamente.`);
+        // 🔸 Ajusta las propiedades según lo que devuelva tu backend
+        this.databases = response.data.map((db) => ({
+          name: db.nombre || db.name,
+          engine: db.motor || db.engine,
+          status: db.estado || "active",
+          created: db.fechaCreacion
+            ? db.fechaCreacion.split("T")[0]
+            : new Date().toISOString().split("T")[0],
+          id: db.id || db.databaseInstanceId,
+        }));
       } catch (error) {
-        console.error("Error al crear la base de datos:", error);
-        if (error.response?.status === 401) {
-          this.showToast("⚠️ No autorizado. Inicia sesión nuevamente.");
-        } else {
-          this.showToast("❌ Ocurrió un error al crear la base de datos.");
-        }
-      } finally {
-        this.isLoading = false;
+        console.error("Error al obtener las bases de datos:", error);
+        this.showToast("No se pudieron cargar las instancias.");
       }
     },
+
+    // 🔹 Crear nueva instancia
+   async createDatabase(engine) {
+  try {
+    this.isLoading = true;
+    const token = localStorage.getItem("token");
+    if (!token) {
+      this.showToast("⚠️ No hay token. Inicia sesión nuevamente.");
+      this.isLoading = false;
+      return;
+    }
+
+    const payload = { motor: engine };
+    const response = await axios.post(this.apiUrl, payload, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    // ✅ Crear objeto de la nueva DB
+    const newDb = {
+      id: response.data.id || response.data.databaseInstanceId,
+      name: response.data.nombre || `ccd_${engine.toLowerCase()}`,
+      engine: response.data.motor || engine,
+      status: "active",
+      created: new Date().toISOString().split("T")[0],
+    };
+
+    this.databases.push(newDb);
+    this.showModal = false;
+
+    // ✅ Mensaje de éxito
+    this.showToast(`✅ Base de datos ${newDb.name} creada correctamente.`);
+  } catch (error) {
+    console.error("Error al crear la base de datos:", error);
+
+    // ❌ Mensaje de error más detallado
+    const msg =
+      error.response?.data?.message ||
+      " Ocurrió un error al crear la base de datos.";
+    this.showToast(msg);
+  } finally {
+    this.isLoading = false;
+  }
+},
+
+    // 🔹 Eliminar instancia
+    async deleteDatabase(db) {
+      if (!confirm(`¿Eliminar la base de datos "${db.name}"?`)) return;
+
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          this.showToast("⚠️ No hay token. Inicia sesión nuevamente.");
+          return;
+        }
+
+        await axios.delete(`${this.apiUrl}/${db.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        this.databases = this.databases.filter((d) => d.id !== db.id);
+        this.showToast(`🗑️ "${db.name}" eliminada correctamente.`);
+      } catch (error) {
+        console.error("Error al eliminar la base de datos:", error);
+        this.showToast("❌ No se pudo eliminar la base de datos.");
+      }
+    },
+
+    // 🔹 Toast helper
     showToast(message) {
       this.toastMessage = message;
       setTimeout(() => (this.toastMessage = ""), 3000);
