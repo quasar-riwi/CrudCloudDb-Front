@@ -11,10 +11,7 @@
         <h6>Total de Bases de Datos</h6>
         <h3>{{ databases.length }}</h3>
       </div>
-      <div class="summary-card">
-        <h6>Disponibles</h6>
-        <h3>{{ databases.filter(db => db.status === 'active').length }}</h3>
-      </div>
+
       <div class="summary-card">
         <h6>Motor más usado</h6>
         <h3>PostgreSQL</h3>
@@ -27,12 +24,11 @@
         <button class="btn-main" @click="showModal = true">+ Nueva Base de Datos</button>
       </div>
 
-      <table class="database-table">
+      <table class="database-table" v-if="databases.length > 0">
         <thead>
           <tr>
             <th>Nombre</th>
             <th>Motor</th>
-            <th>Estado</th>
             <th>Creada</th>
             <th>Acciones</th>
           </tr>
@@ -41,21 +37,16 @@
           <tr v-for="(db, index) in databases" :key="index">
             <td>{{ db.name }}</td>
             <td>{{ db.engine }}</td>
-            <td>
-              <span :class="['status', db.status]">
-                {{ db.status === 'active' ? '🟢 Activa' : '🔴 Inactiva' }}
-              </span>
-            </td>
             <td>{{ db.created }}</td>
             <td class="actions">
-              <button class="btn-view">Ver</button>
-              <button class="btn-delete">Eliminar</button>
+              <button class="btn-delete" @click="confirmDelete(db)">Eliminar</button>
+
             </td>
           </tr>
         </tbody>
       </table>
 
-      <div v-if="databases.length === 0" class="empty">
+      <div v-else class="empty">
         <p>No tienes bases de datos creadas aún.</p>
       </div>
     </section>
@@ -73,12 +64,7 @@
         <template v-else>
           <h3>Selecciona el motor</h3>
           <div class="modal-options">
-            <button
-              v-for="engine in engines"
-              :key="engine"
-              class="modal-btn"
-              @click="createDatabase(engine)"
-            >
+            <button v-for="engine in engines" :key="engine" class="modal-btn" @click="createDatabase(engine)">
               {{ engine }}
             </button>
           </div>
@@ -86,6 +72,25 @@
         </template>
       </div>
     </div>
+
+    <!-- === MODAL CONFIRMAR ELIMINACIÓN === -->
+    <div v-if="showConfirmModal" class="modal-overlay" @click.self="showConfirmModal = false">
+      <div class="modal-box">
+        <h3 style="color: #ef4444;">¿Eliminar base de datos?</h3>
+        <p style="color: #a0a8c3; margin-bottom: 1rem;">
+          Estás a punto de eliminar <strong>{{ dbToDelete?.name }}</strong>.
+          Esta acción no se puede deshacer.
+        </p>
+        <div class="modal-options">
+          <button class="btn btn-danger" 
+            @click="deleteDatabase">
+            Sí, eliminar
+          </button>
+          <button class="btn btn-secondary" @click="showConfirmModal = false">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
 
     <!-- ✅ Toast -->
     <transition name="fade">
@@ -102,19 +107,48 @@ export default {
   data() {
     return {
       apiUrl: "https://service.quasar.andrescortes.dev/api/DatabaseInstances",
-      databases: [
-        { name: "ccd_userdb", engine: "MySQL", status: "active", created: "2025-10-20" },
-        { name: "ccd_logs", engine: "PostgreSQL", status: "active", created: "2025-10-21" },
-        { name: "ccd_cache", engine: "Redis", status: "inactive", created: "2025-10-22" },
-      ],
+      databases: [],
       showModal: false,
-      isLoading: false, // 🔹 Estado de carga
-      toastMessage: "", // 🔹 Mensaje flotante
+      isLoading: false,
+      toastMessage: "",
       engines: ["PostgreSQL", "MySQL", "MongoDB", "SQLServer"],
-      userId: 1,
+      showConfirmModal: false,
+      dbToDelete: null,
     };
   },
+  async mounted() {
+    await this.fetchDatabases();
+  },
   methods: {
+    // 🔹 Obtener las instancias del usuario autenticado
+    async fetchDatabases() {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          this.showToast("⚠️ No hay token. Inicia sesión nuevamente.");
+          return;
+        }
+
+        const response = await axios.get(this.apiUrl, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        this.databases = response.data.map((db) => ({
+          name: db.nombre || db.name,
+          engine: db.motor || db.engine,
+          status: db.estado || "active",
+          created: db.fechaCreacion
+            ? db.fechaCreacion.split("T")[0]
+            : new Date().toISOString().split("T")[0],
+          id: db.id || db.databaseInstanceId,
+        }));
+      } catch (error) {
+        console.error("Error al obtener las bases de datos:", error);
+        this.showToast("❌ No se pudieron cargar las instancias.");
+      }
+    },
+
+    // 🔹 Crear nueva instancia
     async createDatabase(engine) {
       try {
         this.isLoading = true;
@@ -125,16 +159,13 @@ export default {
           return;
         }
 
-        const payload = {
-          motor: engine,
-          usuarioId: this.userId,
-        };
-
+        const payload = { motor: engine };
         const response = await axios.post(this.apiUrl, payload, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         const newDb = {
+          id: response.data.id || response.data.databaseInstanceId,
           name: response.data.nombre || `ccd_${engine.toLowerCase()}`,
           engine: response.data.motor || engine,
           status: "active",
@@ -143,18 +174,89 @@ export default {
 
         this.databases.push(newDb);
         this.showModal = false;
-        this.showToast(`✅ Base de datos ${engine} creada correctamente.`);
+        this.showToast(`✅ Base de datos ${newDb.name} creada correctamente.`);
       } catch (error) {
         console.error("Error al crear la base de datos:", error);
-        if (error.response?.status === 401) {
-          this.showToast("⚠️ No autorizado. Inicia sesión nuevamente.");
-        } else {
-          this.showToast("❌ Ocurrió un error al crear la base de datos.");
-        }
+        const msg =
+          error.response?.data?.message ||
+          "❌ Ocurrió un error al crear la base de datos.";
+        this.showToast(msg);
       } finally {
         this.isLoading = false;
       }
     },
+
+    // 🔹 Eliminar instancia (versión definitiva)
+    async deleteDatabase(db) {
+      const confirmDelete = confirm(`¿Eliminar la base de datos "${db.name}"?`);
+      if (!confirmDelete) return;
+
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          this.showToast("⚠️ No hay token. Inicia sesión nuevamente.");
+          return;
+        }
+
+        // ✅ Enviar solicitud DELETE al backend
+        const response = await axios.delete(`${this.apiUrl}/${db.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (response.status === 200 || response.status === 204) {
+          // ✅ Actualizar la lista local
+          this.databases = this.databases.filter((d) => d.id !== db.id);
+          this.showToast(`🗑️ "${db.name}" eliminada correctamente.`);
+        } else {
+          this.showToast("❌ No se pudo eliminar la base de datos.");
+        }
+      } catch (error) {
+        console.error("Error al eliminar la base de datos:", error);
+        const msg =
+          error.response?.data?.message ||
+          "❌ No se pudo eliminar la base de datos. Inténtalo más tarde.";
+        this.showToast(msg);
+      }
+    },
+    confirmDelete(db) {
+      this.dbToDelete = db;
+      this.showConfirmModal = true;
+    },
+
+    async deleteDatabase() {
+      if (!this.dbToDelete) return;
+      const db = this.dbToDelete;
+      this.showConfirmModal = false;
+
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          this.showToast("⚠️ No hay token. Inicia sesión nuevamente.");
+          return;
+        }
+
+        const response = await axios.delete(`${this.apiUrl}/${db.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (response.status === 200 || response.status === 204) {
+          this.databases = this.databases.filter((d) => d.id !== db.id);
+          this.showToast(`🗑️ "${db.name}" eliminada correctamente.`);
+        } else {
+          this.showToast("❌ No se pudo eliminar la base de datos.");
+        }
+      } catch (error) {
+        console.error("Error al eliminar la base de datos:", error);
+        const msg =
+          error.response?.data?.message ||
+          "❌ No se pudo eliminar la base de datos. Inténtalo más tarde.";
+        this.showToast(msg);
+      } finally {
+        this.dbToDelete = null;
+      }
+    },
+
+    // 🔹 Toast helper
     showToast(message) {
       this.toastMessage = message;
       setTimeout(() => (this.toastMessage = ""), 3000);
@@ -164,6 +266,8 @@ export default {
 </script>
 
 <style scoped>
+
+
 .databases-view {
   background: linear-gradient(180deg, #0b0e1a 0%, #101223 100%);
   min-height: 100vh;
@@ -449,6 +553,7 @@ export default {
 .fade-leave-active {
   transition: opacity 0.5s;
 }
+
 .fade-enter,
 .fade-leave-to {
   opacity: 0;

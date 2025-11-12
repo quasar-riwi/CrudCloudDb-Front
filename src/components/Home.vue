@@ -53,6 +53,14 @@
     </section>
 
     <!-- CTA -->
+     <div class="text-center mt-5 fade-in-up">
+      <button
+        class="btn text-white fw-bold px-5 py-3 shadow-lg rounded-pill zoom-btn"
+        style="background-color: #1B4079;"
+      >
+        + Crear Nueva Base de Datos
+      </button>
+    </div>
     
   </div>
 </template>

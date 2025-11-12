@@ -32,7 +32,7 @@
       </div>
     </aside>
 
-    <!-- CONTENIDO -->
+  
     <main class="content" :class="{ expanded: isCollapsed }">
       <section class="main-content fade-up">
         <router-view :user="user" />
