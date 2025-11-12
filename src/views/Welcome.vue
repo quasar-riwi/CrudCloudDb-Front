@@ -328,9 +328,9 @@ export default {
           popular: false,
           features: [
             { icon: "fas fa-check", text: "Hasta 2 bases de datos", included: true },
-            { icon: "fas fa-check", text: "512 MB RAM por DB", included: true },
-            { icon: "fas fa-check", text: "5 GB Almacenamiento", included: true },
             { icon: "fas fa-check", text: "Backup semanal", included: true },
+            { icon: "fas fa-check", text: "Panel de administración básico", included: true },
+            { icon: "fas fa-times", text: "Monitoreo en tiempo real", included: false },
             { icon: "fas fa-times", text: "Escalado automático", included: false },
             { icon: "fas fa-times", text: "Soporte prioritario", included: false }
           ]
@@ -342,12 +342,12 @@ export default {
           badge: "Popular",
           popular: true,
           features: [
-            { icon: "fas fa-check", text: "Hasta 10 bases de datos", included: true },
-            { icon: "fas fa-check", text: "2 GB RAM por DB", included: true },
-            { icon: "fas fa-check", text: "50 GB Almacenamiento", included: true },
+            { icon: "fas fa-check", text: "Hasta 5 bases de datos", included: true },
             { icon: "fas fa-check", text: "Backup diario", included: true },
+            { icon: "fas fa-check", text: "Monitoreo en tiempo real", included: true },
             { icon: "fas fa-check", text: "Escalado automático", included: true },
-            { icon: "fas fa-times", text: "Soporte prioritario", included: false }
+            { icon: "fas fa-times", text: "Soporte prioritario", included: false },
+            { icon: "fas fa-times", text: "Integraciones avanzadas", included: false }
           ]
         },
         {
@@ -357,11 +357,11 @@ export default {
           badge: "Pro",
           popular: false,
           features: [
-            { icon: "fas fa-check", text: "Bases de datos ilimitadas", included: true },
-            { icon: "fas fa-check", text: "8 GB RAM por DB", included: true },
-            { icon: "fas fa-check", text: "500 GB Almacenamiento", included: true },
+            { icon: "fas fa-check", text: "Hasta 10 bases de datos", included: true },
             { icon: "fas fa-check", text: "Backup en tiempo real", included: true },
+            { icon: "fas fa-check", text: "Monitoreo avanzado y alertas", included: true },
             { icon: "fas fa-check", text: "Escalado automático", included: true },
+            { icon: "fas fa-check", text: "Integraciones avanzadas", included: true },
             { icon: "fas fa-check", text: "Soporte prioritario 24/7", included: true }
           ]
         }

@@ -35,7 +35,21 @@ const routes = [
   name: "ResetPassword",
   component: () => import("@/views/ResetPassword.vue")
 },
-
+{
+  path: '/payment/success',
+  name: 'PaymentSuccess',
+  component: () => import('@/views/payment/PaymentSuccess.vue'),
+},
+{
+  path: '/payment/failure',
+  name: 'PaymentFailure',
+  component: () => import('@/views/payment/PaymentFailure.vue'),
+},
+{
+  path: '/payment/pending',
+  name: 'PaymentPending',
+  component: () => import('@/views/payment/PaymentPending.vue'),
+},
   {
     path: '/dashboard',
     name: 'Dashboard',
