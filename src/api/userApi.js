@@ -1,15 +1,15 @@
 import axios from "axios";
 
-// 🔹 URL base del backend (ajústala si el puerto cambia)
-const API_URL = "https://service.quasar.andrescortes.dev/api/Users";
+// 🔹 URLs base del backend
+const USERS_API = "https://service.quasar.andrescortes.dev/api/Users";
+const PAYMENTS_API = "https://service.quasar.andrescortes.dev/api/Payments";
 
 // =======================================================
 // 📧 Verificar correo electrónico
 // =======================================================
 export const verifyEmail = async (token) => {
   try {
-    // El backend espera el token como query en un GET
-    const response = await axios.get(`${API_URL}/verify-email?token=${token}`);
+    const response = await axios.get(`${USERS_API}/verify-email?token=${token}`);
     return response.data;
   } catch (error) {
     console.error("Error verificando el correo:", error);
@@ -24,7 +24,7 @@ export const verifyEmail = async (token) => {
 // =======================================================
 export const registerUser = async (userData) => {
   try {
-    const response = await axios.post(`${API_URL}/register`, userData);
+    const response = await axios.post(`${USERS_API}/register`, userData);
     return response.data;
   } catch (error) {
     console.error("Error registrando usuario:", error);
@@ -39,8 +39,8 @@ export const registerUser = async (userData) => {
 // =======================================================
 export const loginUser = async (credentials) => {
   try {
-    const response = await axios.post(`${API_URL}/login`, credentials);
-    return response.data; // normalmente incluye el token JWT
+    const response = await axios.post(`${USERS_API}/login`, credentials);
+    return response.data;
   } catch (error) {
     console.error("Error iniciando sesión:", error);
     throw new Error(
@@ -49,9 +49,12 @@ export const loginUser = async (credentials) => {
   }
 };
 
+// =======================================================
+// 🔄 Olvidó la contraseña
+// =======================================================
 export const forgotPassword = async (payload) => {
   try {
-    const response = await axios.post(`${API_URL}/forgot-password`, payload);
+    const response = await axios.post(`${USERS_API}/forgot-password`, payload);
     return response.data;
   } catch (error) {
     console.error("Error en forgotPassword:", error);
@@ -61,9 +64,12 @@ export const forgotPassword = async (payload) => {
   }
 };
 
+// =======================================================
+// 🔐 Restablecer contraseña
+// =======================================================
 export const resetPassword = async ({ token, newPassword }) => {
   try {
-    const response = await axios.post(`${API_URL}/reset-password`, {
+    const response = await axios.post(`${USERS_API}/reset-password`, {
       token,
       newPassword,
       confirmPassword: newPassword
@@ -77,3 +83,31 @@ export const resetPassword = async ({ token, newPassword }) => {
   }
 };
 
+// =======================================================
+// 💳 SUSCRIPCIÓN A PLANES (MercadoPago)
+// =======================================================
+export const subscribePlan = async (plan, email) => {
+  try {
+    const token = localStorage.getItem("token"); // <<--- recuperar token
+
+    const body = { plan, payerEmail: email };
+
+    const response = await axios.post(
+      `${PAYMENTS_API}/subscribe`,
+      body,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // <<--- enviar JWT
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error en subscribePlan:", error);
+    throw new Error(
+      error.response?.data?.message || "Error al crear la suscripción"
+    );                                                                          
+  }
+
+};

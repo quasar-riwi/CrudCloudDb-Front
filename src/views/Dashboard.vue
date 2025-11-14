@@ -6,11 +6,8 @@
     <!-- SIDEBAR -->
     <aside class="sidebar shadow-lg" :class="{ collapsed: isCollapsed }">
       <div class="logo fade-down">
-        <a
-          class="navbar-brand d-flex align-items-center justify-content-center text-white fw-bold"
-          @click="goToDashboard"
-          href="#"
-        >
+        <a class="navbar-brand d-flex align-items-center justify-content-center text-white fw-bold" @click="goToDashboard"
+          href="#">
           <img src="@/assets/logo.png" alt="Logo" height="120" class="logo-img" />
         </a>
       </div>
@@ -22,17 +19,20 @@
         <button class="txtSize" @click="$router.push('/dashboard/Settings')">⚙️ Configuración</button>
       </nav>
 
+      <!-- SECCIÓN DE USUARIO (HTML SIN CAMBIOS) -->
       <div class="user-section fade-up">
-        <div class="user-icon">👤</div>
+        <div class="user-icon">
+          <img v-if="avatarUrl" :src="avatarUrl" alt="Avatar de usuario" class="user-avatar" />
+          <span v-else>👤</span>
+        </div>
         <div class="user-info">
-          <p class="user-name">{{ user ? user.nombre : 'Cargando...' }}</p>
+          <p class="user-name">{{ user ? user.nombre : 'Cargando...' }} {{ user ? user.apellido : '.' }}</p>
           <p class="user-plan">Plan: {{ user ? user.plan : 'Cargando...' }}</p>
           <button class="btn btn-outline-danger w-100 mt-2" @click="logout">Cerrar sesión</button>
         </div>
       </div>
     </aside>
 
-  
     <main class="content" :class="{ expanded: isCollapsed }">
       <section class="main-content fade-up">
         <router-view :user="user" />
@@ -42,6 +42,7 @@
 </template>
 
 <script>
+// EL SCRIPT NO NECESITA CAMBIOS
 import axios from "axios";
 import * as jwtDecode from "jwt-decode";
 
@@ -55,6 +56,15 @@ export default {
       error: "",
       isCollapsed: false,
     };
+  },
+  computed: {
+    avatarUrl() {
+      if (this.user && this.user.nombre) {
+        const seed = encodeURIComponent(this.user.nombre);
+        return `https://api.dicebear.com/8.x/adventurer/svg?seed=${seed}`;
+      }
+      return null;
+    }
   },
   async created() {
     await this.getUserInfo();
@@ -75,7 +85,6 @@ export default {
           this.$router.push("/login");
           return;
         }
-
         const decoded = jwtDecode.jwtDecode(token);
         const userId =
           decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
@@ -83,12 +92,10 @@ export default {
           this.error = "No se pudo obtener el ID del usuario desde el token.";
           return;
         }
-
         const response = await axios.get(`${API_URL}/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         });
-
         this.user = response.data.data;
       } catch (error) {
         if (error.response) {
@@ -144,6 +151,7 @@ export default {
   filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.2));
   transition: transform 0.3s ease;
 }
+
 .logo-img:hover {
   transform: scale(1.05);
 }
@@ -165,30 +173,53 @@ export default {
   border-radius: 8px;
   transition: all 0.3s ease;
 }
+
 .menu button:hover {
   background-color: rgba(77, 124, 138, 0.2);
   color: #fff;
   transform: translateX(5px);
 }
 
+/* === ESTILOS MODIFICADOS PARA EL AVATAR VERTICAL === */
 .user-section {
   display: flex;
-  align-items: flex-start;
+  /* MODIFICADO: Cambiado a 'column' para apilar verticalmente */
   flex-direction: column;
-  gap: 5px;
+  /* MODIFICADO: Ahora centra los elementos horizontalmente */
+  align-items: center;
+  /* Ajusta el espacio vertical entre el avatar y la info */
+  gap: 10px;
   padding: 20px;
   border-top: 1px solid rgba(77, 124, 138, 0.2);
   background-color: rgba(15, 15, 30, 0.8);
 }
 
 .user-icon {
-  font-size: 1.8rem;
+  min-width: 60px; /* Un poco más grande para destacar */
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #2c2c4a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 2px solid rgba(77, 124, 138, 0.3);
+  font-size: 2rem; /* Aumenta el tamaño del emoji de fallback */
+}
+
+.user-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .user-info {
+  width: 100%;
   font-size: 0.9rem;
   margin-top: 5px;
-  width: 100%;
+  /* NUEVO: Centra el texto (nombre, plan) y el botón */
+  text-align: center;
 }
 
 .user-name {
@@ -203,7 +234,8 @@ export default {
   font-size: 0.85rem;
 }
 
-/* === CONTENIDO === */
+
+/* === CONTENIDO (sin cambios) === */
 .content {
   flex: 1;
   background-color: #0e0e1c;
@@ -223,7 +255,7 @@ export default {
   animation: fadeUp 1s ease forwards;
 }
 
-/* === BOTÓN HAMBURGER === */
+/* === BOTÓN HAMBURGER (sin cambios) === */
 .toggle-btn {
   display: none;
   position: fixed;
@@ -239,27 +271,31 @@ export default {
   z-index: 3000;
   transition: background 0.3s ease;
 }
+
 .toggle-btn:hover {
   background: rgba(77, 124, 138, 0.4);
 }
 
-/* === ANIMACIONES === */
+/* === ANIMACIONES (sin cambios) === */
 .fade-up {
   opacity: 0;
   transform: translateY(25px);
   animation: fadeUp 1s ease forwards;
 }
+
 .fade-down {
   opacity: 0;
   transform: translateY(-25px);
   animation: fadeDown 1s ease forwards;
 }
+
 @keyframes fadeUp {
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
+
 @keyframes fadeDown {
   to {
     opacity: 1;
@@ -267,7 +303,7 @@ export default {
   }
 }
 
-/* === RESPONSIVE === */
+/* === RESPONSIVE (sin cambios) === */
 @media (max-width: 992px) {
   .toggle-btn {
     display: block;
