@@ -11,10 +11,17 @@
         <h6>Total de Bases de Datos</h6>
         <h3>{{ databases.length }}</h3>
       </div>
+    </section>
 
-      <div class="summary-card">
-        <h6>Motor más usado</h6>
-        <h3>PostgreSQL</h3>
+    <!-- 🔹 TARJETAS POR MOTOR -->
+    <section class="summary">
+      <div
+        v-for="(item, motor) in engineCounts"
+        :key="motor"
+        class="summary-card engine-card p-3 rounded shadow-sm"
+      >
+        <h6 class="mb-1">{{ motor }}</h6>
+        <h3>{{ item.count }} / {{ item.limit }}</h3>
       </div>
     </section>
 
@@ -40,7 +47,6 @@
             <td>{{ db.created }}</td>
             <td class="actions">
               <button class="btn-delete" @click="confirmDelete(db)">Eliminar</button>
-
             </td>
           </tr>
         </tbody>
@@ -51,20 +57,23 @@
       </div>
     </section>
 
-    <!-- === MODAL === -->
+    <!-- === MODAL CREAR === -->
     <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
       <div class="modal-box">
-        <!-- Cargando -->
         <div v-if="isLoading" class="loading-container">
           <div class="spinner"></div>
           <p>Creando instancia...</p>
         </div>
 
-        <!-- Selección de motor -->
         <template v-else>
           <h3>Selecciona el motor</h3>
           <div class="modal-options">
-            <button v-for="engine in engines" :key="engine" class="modal-btn" @click="createDatabase(engine)">
+            <button
+              v-for="engine in engines"
+              :key="engine"
+              class="modal-btn"
+              @click="createDatabase(engine)"
+            >
               {{ engine }}
             </button>
           </div>
@@ -73,7 +82,7 @@
       </div>
     </div>
 
-    <!-- === MODAL CONFIRMAR ELIMINACIÓN === -->
+    <!-- === MODAL ELIMINAR === -->
     <div v-if="showConfirmModal" class="modal-overlay" @click.self="showConfirmModal = false">
       <div class="modal-box">
         <h3 style="color: #ef4444;">¿Eliminar base de datos?</h3>
@@ -82,17 +91,13 @@
           Esta acción no se puede deshacer.
         </p>
         <div class="modal-options">
-          <button class="btn btn-danger" 
-            @click="deleteDatabase">
-            Sí, eliminar
-          </button>
+          <button class="btn btn-danger" @click="deleteDatabase">Sí, eliminar</button>
           <button class="btn btn-secondary" @click="showConfirmModal = false">Cancelar</button>
         </div>
       </div>
     </div>
 
-
-    <!-- ✅ Toast -->
+    <!-- Toast -->
     <transition name="fade">
       <div v-if="toastMessage" class="toast">{{ toastMessage }}</div>
     </transition>
@@ -104,6 +109,8 @@ import axios from "axios";
 
 export default {
   name: "Databases",
+  props: ["user"], // ⬅ RECIBIR EL PLAN DEL USUARIO
+
   data() {
     return {
       apiUrl: "https://service.quasar.andrescortes.dev/api/DatabaseInstances",
@@ -116,11 +123,51 @@ export default {
       dbToDelete: null,
     };
   },
+
   async mounted() {
     await this.fetchDatabases();
   },
+
+  computed: {
+    // 🔹 LÍMITE SEGÚN EL PLAN
+    userLimit() {
+      if (!this.user || !this.user.plan) return 2;
+
+      switch (this.user.plan.toLowerCase()) {
+        case "gratis":
+          return 2;
+        case "intermedio":
+          return 5;
+        case "avanzado":
+          return 10;
+        default:
+          return 2;
+      }
+    },
+
+    // 🔹 Contar bases por motor + añadir límite
+    engineCounts() {
+      const counts = {};
+
+      this.databases.forEach((db) => {
+        if (!counts[db.engine]) {
+          counts[db.engine] = { count: 0, limit: this.userLimit };
+        }
+        counts[db.engine].count++;
+      });
+
+      // Si un motor tiene 0, igual debe aparecer
+      this.engines.forEach((engine) => {
+        if (!counts[engine]) {
+          counts[engine] = { count: 0, limit: this.userLimit };
+        }
+      });
+
+      return counts;
+    },
+  },
+
   methods: {
-    // 🔹 Obtener las instancias del usuario autenticado
     async fetchDatabases() {
       try {
         const token = localStorage.getItem("token");
@@ -148,10 +195,10 @@ export default {
       }
     },
 
-    // 🔹 Crear nueva instancia
     async createDatabase(engine) {
       try {
         this.isLoading = true;
+
         const token = localStorage.getItem("token");
         if (!token) {
           this.showToast("⚠️ No hay token. Inicia sesión nuevamente.");
@@ -186,38 +233,6 @@ export default {
       }
     },
 
-    // 🔹 Eliminar instancia (versión definitiva)
-    async deleteDatabase(db) {
-      const confirmDelete = confirm(`¿Eliminar la base de datos "${db.name}"?`);
-      if (!confirmDelete) return;
-
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          this.showToast("⚠️ No hay token. Inicia sesión nuevamente.");
-          return;
-        }
-
-        // ✅ Enviar solicitud DELETE al backend
-        const response = await axios.delete(`${this.apiUrl}/${db.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (response.status === 200 || response.status === 204) {
-          // ✅ Actualizar la lista local
-          this.databases = this.databases.filter((d) => d.id !== db.id);
-          this.showToast(`🗑️ "${db.name}" eliminada correctamente.`);
-        } else {
-          this.showToast("❌ No se pudo eliminar la base de datos.");
-        }
-      } catch (error) {
-        console.error("Error al eliminar la base de datos:", error);
-        const msg =
-          error.response?.data?.message ||
-          "❌ No se pudo eliminar la base de datos. Inténtalo más tarde.";
-        this.showToast(msg);
-      }
-    },
     confirmDelete(db) {
       this.dbToDelete = db;
       this.showConfirmModal = true;
@@ -225,15 +240,12 @@ export default {
 
     async deleteDatabase() {
       if (!this.dbToDelete) return;
+
       const db = this.dbToDelete;
       this.showConfirmModal = false;
 
       try {
         const token = localStorage.getItem("token");
-        if (!token) {
-          this.showToast("⚠️ No hay token. Inicia sesión nuevamente.");
-          return;
-        }
 
         const response = await axios.delete(`${this.apiUrl}/${db.id}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -246,17 +258,16 @@ export default {
           this.showToast("❌ No se pudo eliminar la base de datos.");
         }
       } catch (error) {
-        console.error("Error al eliminar la base de datos:", error);
+        console.error("Error al eliminar:", error);
         const msg =
           error.response?.data?.message ||
-          "❌ No se pudo eliminar la base de datos. Inténtalo más tarde.";
+          "❌ No se pudo eliminar la base de datos.";
         this.showToast(msg);
       } finally {
         this.dbToDelete = null;
       }
     },
 
-    // 🔹 Toast helper
     showToast(message) {
       this.toastMessage = message;
       setTimeout(() => (this.toastMessage = ""), 3000);
@@ -264,10 +275,7 @@ export default {
   },
 };
 </script>
-
 <style scoped>
-
-
 .databases-view {
   background: linear-gradient(180deg, #0b0e1a 0%, #101223 100%);
   min-height: 100vh;

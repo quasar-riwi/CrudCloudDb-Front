@@ -36,17 +36,17 @@ const routes = [
   component: () => import("@/views/ResetPassword.vue")
 },
 {
-  path: '/payment/success',
+  path: '/payment/PaymentSuccess',
   name: 'PaymentSuccess',
   component: () => import('@/views/payment/PaymentSuccess.vue'),
 },
 {
-  path: '/payment/failure',
+  path: '/payment/PaymentFailure',
   name: 'PaymentFailure',
   component: () => import('@/views/payment/PaymentFailure.vue'),
 },
 {
-  path: '/payment/pending',
+  path: '/payment/PaymentPending',
   name: 'PaymentPending',
   component: () => import('@/views/payment/PaymentPending.vue'),
 },

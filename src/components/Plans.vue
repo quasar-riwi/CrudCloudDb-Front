@@ -4,10 +4,8 @@
 
     <div class="plans-container">
 
-      <div
-        class="plan-card free"
-        :class="{ disabled: userPlan === 'Gratis' }"
-      >
+      <!-- PLAN GRATIS -->
+      <div class="card free" :class="{ disabled: userPlan === 'Gratis' }">
         <div class="plan-header">
           <h3>Plan Gratuito</h3>
           <p class="subtitle">Ideal para empezar</p>
@@ -18,16 +16,14 @@
         <button
           class="btn-select"
           :disabled="userPlan === 'Gratis'"
+          @click="selectPlan('Gratis')"
         >
           {{ userPlan === 'Gratis' ? 'Plan actual ' : 'Seleccionar' }}
         </button>
       </div>
 
-
-      <div
-        class="plan-card medium"
-        :class="{ disabled: userPlan === 'Intermedio' }"
-      >
+      <!-- PLAN INTERMEDIO -->
+      <div class="card medium" :class="{ disabled: userPlan === 'Intermedio' }">
         <div class="plan-header">
           <h3>Plan Intermedio</h3>
           <p class="subtitle">Perfecto para proyectos pequeños</p>
@@ -38,15 +34,14 @@
         <button
           class="btn-select"
           :disabled="userPlan === 'Intermedio'"
+          @click="selectPlan('Intermedio')"
         >
           {{ userPlan === 'Intermedio' ? 'Plan actual ✅' : 'Seleccionar' }}
         </button>
       </div>
 
-      <div
-        class="plan-card pro"
-        :class="{ disabled: userPlan === 'Avanzado' }"
-      >
+      <!-- PLAN AVANZADO -->
+      <div class="card pro" :class="{ disabled: userPlan === 'Avanzado' }">
         <div class="plan-header">
           <h3>Plan Avanzado</h3>
           <p class="subtitle">Para empresas o proyectos grandes</p>
@@ -57,32 +52,64 @@
         <button
           class="btn-select"
           :disabled="userPlan === 'Avanzado'"
+          @click="selectPlan('Avanzado')"
         >
           {{ userPlan === 'Avanzado' ? 'Plan actual ✅' : 'Seleccionar' }}
         </button>
       </div>
+
     </div>
   </div>
 </template>
 
 <script>
+import { subscribePlan } from "@/api/userApi";
+
 export default {
   name: "Plans",
+
   props: {
     user: {
       type: Object,
-      required: true
+      default: null
     }
   },
+
   computed: {
     userPlan() {
-      return this.user?.plan || '';
+      return this.user?.plan || "";
+    }
+  },
+
+  methods: {
+    async selectPlan(planName) {
+      try {
+        if (!this.user) {
+          alert("Cargando información del usuario...");
+          return;
+        }
+
+        const response = await subscribePlan(planName, this.user.email);
+
+        if (!response || !response.initPointUrl) {
+          alert("No se recibió enlace de pago.");
+          return;
+        }
+
+        // Redirección a Mercado Pago
+        window.location.href = response.initPointUrl;
+
+      } catch (err) {
+        console.error(err);
+        alert("Error al procesar la suscripción.");
+      }
     }
   }
 };
 </script>
 
 <style scoped>
+/* TODO TU CSS ORIGINAL SIN CAMBIOS */
 .plans-page {
   min-height: 100vh;
   background: linear-gradient(180deg, #0b0e1a 0%, #101223 100%);
@@ -112,7 +139,7 @@ export default {
   gap: 3rem;
 }
 
-.plan-card {
+.card {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(79, 140, 255, 0.2);
   border-radius: 20px;
@@ -128,7 +155,7 @@ export default {
   backdrop-filter: blur(8px);
 }
 
-.plan-card:hover {
+.card:hover {
   transform: translateY(-10px);
   box-shadow: 0 15px 35px rgba(79, 140, 255, 0.25);
 }
@@ -159,7 +186,6 @@ export default {
   margin-bottom: 1.5rem;
 }
 
-/* Botón */
 .btn-select {
   background: linear-gradient(90deg, #0d47a1, #1b74ff);
   color: #fff;
@@ -191,7 +217,7 @@ export default {
     align-items: center;
   }
 
-  .plan-card {
+  .card {
     width: 90%;
     max-width: 400px;
     height: auto;
