@@ -97,10 +97,17 @@
       </div>
     </div>
 
-    <!-- Toast -->
-    <transition name="fade">
-      <div v-if="toastMessage" class="toast">{{ toastMessage }}</div>
-    </transition>
+    <!-- === MODAL DE ESTADO (ÉXITO / ERROR) === -->
+    <div v-if="showStatusModal" class="modal-overlay" @click.self="closeStatusModal">
+      <div class="modal-box status-modal">
+        <h3 :class="statusType === 'success' ? 'status-success' : 'status-error'">
+          {{ statusType === 'success' ? '✔️ Éxito' : '❌ Error' }}
+        </h3>
+        <p style="color:#b6bde0; margin: 1rem 0;">{{ statusMessage }}</p>
+        <button class="modal-btn" @click="closeStatusModal">Cerrar</button>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -109,7 +116,7 @@ import axios from "axios";
 
 export default {
   name: "Databases",
-  props: ["user"], // ⬅ RECIBIR EL PLAN DEL USUARIO
+  props: ["user"],
 
   data() {
     return {
@@ -117,10 +124,14 @@ export default {
       databases: [],
       showModal: false,
       isLoading: false,
-      toastMessage: "",
       engines: ["PostgreSQL", "MySQL", "MongoDB", "SQLServer"],
       showConfirmModal: false,
       dbToDelete: null,
+
+      // 🔹 Nuevo modal de estado
+      showStatusModal: false,
+      statusMessage: "",
+      statusType: "success",
     };
   },
 
@@ -129,23 +140,17 @@ export default {
   },
 
   computed: {
-    // 🔹 LÍMITE SEGÚN EL PLAN
     userLimit() {
       if (!this.user || !this.user.plan) return 2;
 
       switch (this.user.plan.toLowerCase()) {
-        case "gratis":
-          return 2;
-        case "intermedio":
-          return 5;
-        case "avanzado":
-          return 10;
-        default:
-          return 2;
+        case "gratis": return 2;
+        case "intermedio": return 5;
+        case "avanzado": return 10;
+        default: return 2;
       }
     },
 
-    // 🔹 Contar bases por motor + añadir límite
     engineCounts() {
       const counts = {};
 
@@ -156,7 +161,6 @@ export default {
         counts[db.engine].count++;
       });
 
-      // Si un motor tiene 0, igual debe aparecer
       this.engines.forEach((engine) => {
         if (!counts[engine]) {
           counts[engine] = { count: 0, limit: this.userLimit };
@@ -168,11 +172,21 @@ export default {
   },
 
   methods: {
+    openStatusModal(message, type = "success") {
+      this.statusMessage = message;
+      this.statusType = type;
+      this.showStatusModal = true;
+    },
+
+    closeStatusModal() {
+      this.showStatusModal = false;
+    },
+
     async fetchDatabases() {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
-          this.showToast("⚠️ No hay token. Inicia sesión nuevamente.");
+          this.openStatusModal("No hay token. Inicia sesión.", "error");
           return;
         }
 
@@ -190,8 +204,7 @@ export default {
           id: db.id || db.databaseInstanceId,
         }));
       } catch (error) {
-        console.error("Error al obtener las bases de datos:", error);
-        this.showToast("❌ No se pudieron cargar las instancias.");
+        this.openStatusModal("No se pudieron cargar las instancias.", "error");
       }
     },
 
@@ -201,7 +214,7 @@ export default {
 
         const token = localStorage.getItem("token");
         if (!token) {
-          this.showToast("⚠️ No hay token. Inicia sesión nuevamente.");
+          this.openStatusModal("No hay token. Inicia sesión.", "error");
           this.isLoading = false;
           return;
         }
@@ -221,13 +234,14 @@ export default {
 
         this.databases.push(newDb);
         this.showModal = false;
-        this.showToast(`✅ Base de datos ${newDb.name} creada correctamente.`);
+
+        this.openStatusModal(`Base de datos ${newDb.name} creada correctamente.`, "success");
+
       } catch (error) {
-        console.error("Error al crear la base de datos:", error);
         const msg =
           error.response?.data?.message ||
-          "❌ Ocurrió un error al crear la base de datos.";
-        this.showToast(msg);
+          "Ocurrió un error al crear la base de datos.";
+        this.openStatusModal(msg, "error");
       } finally {
         this.isLoading = false;
       }
@@ -251,26 +265,18 @@ export default {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (response.status === 200 || response.status === 204) {
-          this.databases = this.databases.filter((d) => d.id !== db.id);
-          this.showToast(`🗑️ "${db.name}" eliminada correctamente.`);
-        } else {
-          this.showToast("❌ No se pudo eliminar la base de datos.");
-        }
+        this.databases = this.databases.filter((d) => d.id !== db.id);
+
+        this.openStatusModal(`"${db.name}" eliminada correctamente.`, "success");
+
       } catch (error) {
-        console.error("Error al eliminar:", error);
         const msg =
           error.response?.data?.message ||
-          "❌ No se pudo eliminar la base de datos.";
-        this.showToast(msg);
+          "No se pudo eliminar la base de datos.";
+        this.openStatusModal(msg, "error");
       } finally {
         this.dbToDelete = null;
       }
-    },
-
-    showToast(message) {
-      this.toastMessage = message;
-      setTimeout(() => (this.toastMessage = ""), 3000);
     },
   },
 };

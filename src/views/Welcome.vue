@@ -93,25 +93,12 @@
       </div>
     </section>
 
-    <!-- ESTADÍSTICAS -->
-    <section class="py-5 futuristic-bg">
-      <div class="container">
-        <div class="stats-section">
-          <div class="row text-center">
-            <div class="col-md-3 col-6 mb-4" v-for="(stat, index) in stats" :key="index">
-              <div class="stat-number">{{ stat.value }}</div>
-              <div class="stat-label">{{ stat.label }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <!-- CÓMO FUNCIONA -->
-    <section id="funciona" class="py-5 futuristic-bg">
+    <section id="funciona" class="py-5 align-center futuristic-bg">
       <div class="container">
         <h2 class="section-title">¿Cómo funciona CrudCloud?</h2>
-        <p class="section-subtitle">En solo cuatro simples pasos, tendrás tu base de datos lista para producción.</p>
+        <p class="section-subtitle">En solo tres simples pasos, tendrás tu base de datos lista para producción.</p>
 
         <div class="row g-4">
           <div class="col-md-6 col-lg-3" v-for="(step, index) in steps" :key="index">
@@ -134,22 +121,37 @@
       </div>
     </section>
 
-    <!-- TECNOLOGÍAS SOPORTADAS -->
-    <section id="tecnologias" class="py-5 futuristic-bg">
-      <div class="container">
-        <h2 class="section-title">Tecnologías Soportadas</h2>
-        <p class="section-subtitle">Ofrecemos soporte para los motores de bases de datos más populares del mercado.</p>
+  <!-- TECNOLOGÍAS SOPORTADAS -->
+<section id="tecnologias" class="py-5 futuristic-bg">
+  <div class="container">
+    <h2 class="section-title">Tecnologías Soportadas</h2>
+    <p class="section-subtitle">Ofrecemos soporte para los motores de bases de datos más populares del mercado.</p>
 
-        <div class="row g-4 justify-content-center">
-          <div class="col-6 col-md-4 col-lg-2" v-for="(tech, index) in technologies" :key="index">
-            <div class="database-card">
-              <i :class="`${tech.icon} text-info fs-1 mb-3`"></i>
-              <h6>{{ tech.name }}</h6>
-            </div>
+    <div class="row g-4 justify-content-center">
+      <div class="col-6 col-md-4 col-lg-2" 
+           v-for="(tech, index) in technologies" 
+           :key="index">
+           
+        <div class="database-card text-center p-3 shadow-sm rounded-3"
+             style="background: rgba(255, 255, 255, 0.06);
+                    backdrop-filter: blur(6px);
+                    transition: 0.3s;">
+
+          <!-- Imagen del motor -->
+          <div class="tech-logo-wrapper mb-3"
+               style="width: 80px; height: 80px; margin: auto; display: flex; align-items: center; justify-content: center;">
+            <img :src="tech.image"
+                 :alt="tech.name"
+                 style="max-width: 100%; max-height: 100%; object-fit: contain;">
           </div>
+
+          <h6 class="mt-2">{{ tech.name }}</h6>
         </div>
+
       </div>
-    </section>
+    </div>
+  </div>
+</section>
 
     <!-- PLANES Y PRECIOS -->
     <section id="planes" class="py-5 futuristic-bg">
@@ -248,45 +250,24 @@ export default {
           icon: "fas fa-bolt",
           title: "Despliegue Instantáneo",
           description: "Crea instancias de bases de datos en segundos con nuestra interfaz intuitiva o API. Configuración automatizada sin complicaciones.",
-          items: ["Implementación en menos de 60 segundos", "Interfaz intuitiva y API RESTful", "Configuración automatizada"]
+          items: ["Implementación en menos de 60 segundos", "Interfaz intuitiva ", "Configuración automatizada"]
         },
-        {
-          icon: "fas fa-chart-line",
-          title: "Escalabilidad Automática",
-          description: "Escala tus recursos vertical y horizontalmente sin interrupciones, según la demanda. Paga solo por lo que usas.",
-          items: ["Auto-escalado según carga", "Balanceo de carga inteligente", "Pago por uso"]
-        },
+      
         {
           icon: "fas fa-shield-alt",
           title: "Seguridad Integrada",
-          description: "Backups automáticos, encriptación end-to-end y redes privadas para proteger tus datos. Cumplimiento con estándares internacionales.",
-          items: ["Encriptación AES-256", "Backups automáticos", "Redes privadas virtuales"]
+          description: "Se usa autenticacion jwt para proteger la informacion de nuestros usuarios y mediante hasheo se protegen las rutas.",
+          items: ["Encriptación","Redes privadas virtuales"]
         },
         {
-          icon: "fas fa-tachometer-alt",
-          title: "Máximo Rendimiento",
-          description: "Infraestructura optimizada para bases de datos con SSD de alta velocidad y baja latencia. Monitoreo en tiempo real.",
-          items: ["SSD de alta velocidad", "Baja latencia garantizada", "Monitoreo 24/7"]
+          icon: "fas fa-bell",
+          title: "Mantente al tanto de los movimientos en tu cuenta",
+          description: "Cada accion va ser notificada en tu dispositivo movil",
+          items: [ "Monitoreo 24/7"]
         },
-        {
-          icon: "fas fa-sync-alt",
-          title: "Alta Disponibilidad",
-          description: "Replicación automática entre zonas de disponibilidad. Tolerancia a fallos y recuperación ante desastres integrada.",
-          items: ["Replicación multi-zona", "99.95% SLA garantizado", "Recuperación automática"]
-        },
-        {
-          icon: "fas fa-cogs",
-          title: "Integración Total",
-          description: "Conecta fácilmente con tus herramientas favoritas. APIs compatibles con los principales frameworks y lenguajes.",
-          items: ["SDKs para todos los lenguajes", "Integración con CI/CD", "Webhooks y eventos"]
-        }
+      
       ],
-      stats: [
-        { value: "10K+", label: "Bases de Datos Activas" },
-        { value: "99.95%", label: "Tiempo de Actividad" },
-        { value: "2.5M", label: "Consultas por Segundo" },
-        { value: "50+", label: "Países Servidos" }
-      ],
+     
       steps: [
         {
           number: "01",
@@ -300,24 +281,19 @@ export default {
           description: "Define los recursos como CPU, RAM y almacenamiento que tu app necesita. Escoge entre planes predefinidos o personalizados.",
           icon: "fas fa-sliders-h fa-2x"
         },
+        
         {
           number: "03",
-          title: "Personaliza seguridad",
-          description: "Configura reglas de firewall, conexiones SSL, usuarios y permisos. Define políticas de backup y recuperación.",
-          icon: "fas fa-user-shield fa-2x"
-        },
-        {
-          number: "04",
           title: "Conecta tu app",
           description: "Usa la cadena de conexión proporcionada y listo en minutos. Documentación completa y ejemplos de código incluidos.",
           icon: "fas fa-plug fa-2x"
         }
       ],
       technologies: [
-        { icon: "ri-database-2-line", name: "PostgreSQL" },
-        { icon: "ri-database-2-fill", name: "MySQL" },
-        { icon: "ri-server-line", name: "SQL Server" },
-        { icon: "ri-leaf-line", name: "MongoDB" },
+        { image: "/src/assets/postgre.png", name: "PostgreSQL" },
+        { image: "/src/assets/mysql.png", name: "MySQL" },
+        { image: "/src/assets/sqlserve.png", name: "SQL Server" },
+        { image: "/src/assets/mongodb.png", name: "MongoDB" },
       ],
       plans: [
         {
@@ -465,6 +441,10 @@ h1, h2, h3, h4, h5, .navbar-brand {
   z-index: 0;
 }
 
+#funciona .row {
+  justify-content: center;
+  text-align: center;
+}
 .grid-pattern {
   position: absolute;
   top: 0;

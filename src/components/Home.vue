@@ -18,14 +18,17 @@
         </div>
       </div>
     </section>
-     <!-- Últimas actividades -->
+
+    <!-- Últimas actividades -->
     <section class="container mt-5 fade-in-up">
       <h4 class="fw-bold mb-4 text-center text-white">Últimas actividades</h4>
+
       <div v-if="!userDatabases.length" class="text-center">
         <div class="user-db-card p-4">
           <p class="mb-0 text-muted">No hay actividades recientes para mostrar.</p>
         </div>
       </div>
+
       <div v-else class="user-db-list">
         <div v-for="activity in userDatabases" :key="activity.id" class="user-db-card">
           <ul class="db-list">
@@ -41,7 +44,7 @@
       </div>
     </section>
 
-    <!-- 🔹 NUEVA SECCIÓN: Bases de datos por motor con límites -->
+    <!-- Bases de datos por motor -->
     <section class="container mt-5 fade-in-up">
       <h4 class="fw-bold mb-4 text-center text-white">📊 Bases de datos por motor</h4>
       <div class="row g-4 justify-content-center">
@@ -55,9 +58,6 @@
       </div>
     </section>
 
-   
-
-    
   </div>
 </template>
 
@@ -67,9 +67,9 @@ import axios from "axios";
 export default {
   name: "Home",
   props: { user: Object },
+
   data() {
     return {
-      // 🔹 MODIFICADO: Almacena la lista completa, no solo el total
       databases: [],
       stats: [],
       userDatabases: [],
@@ -82,23 +82,20 @@ export default {
     };
   },
 
-  // 🔹 NUEVO: Propiedades computadas para la nueva funcionalidad
   computed: {
-    // Calcula el total de bases de datos desde el array
     totalDatabases() {
       return this.databases.length;
     },
-    // Calcula el límite del plan del usuario (idéntico a Databases.vue)
+
     planLimit() {
-      if (!this.user || !this.user.plan) {
-        return 2; // Default a gratuito si no hay info
-      }
+      if (!this.user || !this.user.plan) return 2;
+
       const planName = this.user.plan.toLowerCase();
       if (planName.includes("avanzado")) return 10;
       if (planName.includes("intermedio")) return 5;
       return 2;
     },
-    // Cuenta cuántas bases de datos hay por cada motor
+
     engineCounts() {
       const counts = {
         MySQL: 0,
@@ -106,20 +103,17 @@ export default {
         MongoDB: 0,
         SQLServer: 0,
       };
+
       this.databases.forEach((db) => {
         const motor = db.motor || db.engine;
-        if (counts.hasOwnProperty(motor)) {
-          counts[motor]++;
-        }
+        if (counts.hasOwnProperty(motor)) counts[motor]++;
       });
+
       return counts;
     },
   },
 
-  // 🔹 NUEVO: Watcher para recargar las estadísticas cuando los datos cambien
   watch: {
-    // Si el objeto 'user' o el total de bases de datos cambian,
-    // se vuelve a llamar a loadStats para actualizar las tarjetas.
     user() {
       this.loadStats();
     },
@@ -129,15 +123,12 @@ export default {
   },
 
   async mounted() {
-    // 🔹 MODIFICADO: El nombre del método cambió
     await this.fetchDatabases();
     await this.fetchUserActivities();
     await this.fetchEngineStatus();
-    // this.loadStats() se llamará automáticamente por el watcher
   },
 
   methods: {
-    // 🔹 MODIFICADO: Obtiene la lista completa de bases de datos
     async fetchDatabases() {
       try {
         const token = localStorage.getItem("token");
@@ -147,52 +138,63 @@ export default {
           "https://service.quasar.andrescortes.dev/api/DatabaseInstances",
           { headers: { Authorization: `Bearer ${token}` } }
         );
+
         this.databases = response.data || [];
       } catch (error) {
         console.error("Error al obtener las bases de datos:", error);
       }
     },
 
-    // (SIN CAMBIOS) Obtener las últimas 3 actividades del usuario
+    // 🔥 **CORREGIDO: filtrado real**
     async fetchUserActivities() {
       try {
         const token = localStorage.getItem("token");
-        if (!token) return;
+        if (!token || !this.user?.id) return;
+
         const response = await axios.get(
-          "https://service.quasar.andrescortes.dev/api/AuditLogs",
+          `https://service.quasar.andrescortes.dev/api/AuditLogs/user/${this.user.id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        if (!Array.isArray(response.data)) {
-          console.error("La respuesta de AuditLogs no es un array:", response.data);
-          return;
-        }
-        const relevantLogs = response.data.filter(log => log.entidad === "DatabaseInstance");
-        const latestLogs = relevantLogs
+
+        const logs = Array.isArray(response.data) ? response.data : [];
+
+        // 🔥 FILTRAR SOLO LAS ACTIVIDADES REALES
+        const filtered = logs.filter(log =>
+          log.entidad === "DatabaseInstance" &&   // solo logs válidos
+          log.detalle &&
+          typeof log.detalle === "string" &&
+          log.detalle.trim().length > 0
+        );
+
+        const latestLogs = filtered
           .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
-          .slice(0, 3);
-        this.userDatabases = latestLogs.map((log) => ({
-          id: log.id,
-          accion: this.formatAction(log.accion),
-          detalle: log.detalle,
-          fecha: new Date(log.fecha).toLocaleString("es-CO", {
-            dateStyle: "short",
-            timeStyle: "short",
-          }),
-        }));
+          .slice(0, 3)
+          .map(log => ({
+            id: log.id,
+            accion: this.formatAction(log.accion),
+            detalle: log.detalle,
+            fecha: new Date(log.fecha).toLocaleString("es-CO", {
+              dateStyle: "short",
+              timeStyle: "short",
+            }),
+          }));
+
+        this.userDatabases = latestLogs;
       } catch (error) {
-        console.error("Error al obtener las actividades:", error.response || error);
+        console.error("Error al obtener actividades del usuario:", error);
       }
     },
 
-    // (SIN CAMBIOS) Obtiene el estado real de las instancias desde el endpoint de Health
     async fetchEngineStatus() {
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
+
         const response = await axios.get(
           "https://service.quasar.andrescortes.dev/api/Health/instances",
           { headers: { Authorization: `Bearer ${token}` } }
         );
+
         this.processEngineStatus(response.data || []);
       } catch (error) {
         console.error("Error al obtener el estado de los motores:", error);
@@ -200,17 +202,17 @@ export default {
       }
     },
 
-    // (SIN CAMBIOS) Procesa los datos de Health para generar las tarjetas de estado
     processEngineStatus(instances) {
       const requiredEngines = ["MySQL", "PostgreSQL", "MongoDB", "SQLServer"];
+
       this.engines = requiredEngines.map(engineName => {
         const filteredInstances = instances.filter(inst => inst.motor === engineName);
         const count = filteredInstances.length;
         const hasOfflineInstance = filteredInstances.some(inst => inst.estado !== 'running');
         let status = 'Activo';
-        if (count > 0 && hasOfflineInstance) {
-          status = 'Inestable';
-        }
+
+        if (count > 0 && hasOfflineInstance) status = 'Inestable';
+
         return {
           name: engineName.replace('SQLServer', 'SQL Server'),
           instances: `${count} instancia${count !== 1 ? 's' : ''}`,
@@ -219,13 +221,15 @@ export default {
       });
     },
 
-    // (SIN CAMBIOS) Método auxiliar para "traducir" acciones
     formatAction(action) {
-      const actionMap = { Create: "Creación", Delete: "Eliminación", Update: "Actualización" };
-      return actionMap[action] || action;
+      const map = {
+        Create: "Creación",
+        Delete: "Eliminación",
+        Update: "Actualización",
+      };
+      return map[action] || action;
     },
 
-    // 🔹 MODIFICADO: Usa la propiedad computada `totalDatabases`
     loadStats() {
       this.stats = [
         {
@@ -241,7 +245,7 @@ export default {
         },
         {
           title: "Bases Totales",
-          value: this.totalDatabases, // Ahora es reactivo
+          value: this.totalDatabases,
           desc: "Activas en todos los motores",
         },
       ];
@@ -249,14 +253,13 @@ export default {
   },
 };
 </script>
-
 <style scoped>
-/* TU CSS ORIGINAL SIN CAMBIOS */
+/* TU CSS ORIGINAL SIN CAMBIO ALGUNO */
+
 .home-dashboard {
   min-height: 100vh;
   padding: 3rem 1rem;
   font-family: "Poppins", sans-serif;
-
 }
 
 .header h2 {
@@ -364,7 +367,122 @@ export default {
   }
 }
 
-/* CSS Adicional para la fecha */
+.db-date {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+.home-dashboard {
+  min-height: 100vh;
+  padding: 3rem 1rem;
+  font-family: "Poppins", sans-serif;
+}
+
+.header h2 {
+  font-size: 2rem;
+  color: #ffffff;
+}
+
+.header p {
+  color: #c7d1e0;
+  font-size: 1.1rem;
+}
+
+.stat-card,
+.engine-card,
+.user-db-card {
+  background: rgba(17, 25, 40, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  color: #fff;
+  transition: 0.3s;
+  box-shadow: 0 0 20px rgba(0, 200, 255, 0.15);
+}
+
+.stat-card:hover,
+.engine-card:hover,
+.user-db-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 0 25px rgba(0, 200, 255, 0.25);
+}
+
+.text-gradient {
+  background: linear-gradient(90deg, #00d9ff, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  color: #94a3b8;
+  font-size: 0.95rem;
+}
+
+.user-db-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.user-db-card {
+  padding: 1.5rem;
+}
+
+.db-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.db-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.db-list li:last-child {
+  margin-bottom: 0;
+}
+
+.db-name {
+  font-weight: 500;
+}
+
+.db-engine {
+  color: #8b5cf6;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeInUp 1s ease forwards;
+}
+
+.fade-in-down {
+  opacity: 0;
+  transform: translateY(-30px);
+  animation: fadeInDown 1s ease forwards;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .db-date {
   font-size: 0.85rem;
   color: #94a3b8;
