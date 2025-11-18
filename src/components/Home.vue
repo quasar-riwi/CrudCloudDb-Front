@@ -1,12 +1,12 @@
 <template>
   <div class="home-dashboard text-white">
-    <!-- Header -->
+
     <header class="header text-center mb-5 fade-in-down">
       <h2 class="fw-bold">👋 {{ user ? user.nombre : "Cargando..." }}</h2>
       <p>Bienvenido a tu panel de <strong>Cloud Platform</strong>.</p>
     </header>
 
-    <!-- Stats Principales -->
+    <!-- Estadísticas -->
     <section class="container fade-in-up">
       <div class="row g-4 justify-content-center">
         <div class="col-md-3" v-for="(stat, i) in stats" :key="i">
@@ -108,9 +108,16 @@ export default {
   },
 
   watch: {
-    user() {
-      this.loadStats();
+    user: {
+      async handler(newUser) {
+        if (newUser && newUser.id) {
+          this.loadStats();
+          await this.fetchUserActivities();   // 🔥 CARGA ACTIVIDADES APENAS USER ESTÉ LISTO
+        }
+      },
+      immediate: true,  // 🔥 EJECUTA EL WATCHER APENAS MONTA EL COMPONENTE
     },
+
     totalDatabases() {
       this.loadStats();
     }
@@ -118,7 +125,6 @@ export default {
 
   async mounted() {
     await this.fetchDatabases();
-    await this.fetchUserActivities();
   },
 
   methods: {
