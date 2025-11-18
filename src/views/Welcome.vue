@@ -275,15 +275,10 @@ export default {
           description: "Selecciona entre una variedad de bases de datos SQL y NoSQL populares: PostgreSQL, MySQL, MongoDB y más.",
           icon: "fas fa-database fa-2x"
         },
-        {
-          number: "02",
-          title: "Configura tu plan",
-          description: "Define los recursos como CPU, RAM y almacenamiento que tu app necesita. Escoge entre planes predefinidos o personalizados.",
-          icon: "fas fa-sliders-h fa-2x"
-        },
+       
         
         {
-          number: "03",
+          number: "02",
           title: "Conecta tu app",
           description: "Usa la cadena de conexión proporcionada y listo en minutos. Documentación completa y ejemplos de código incluidos.",
           icon: "fas fa-plug fa-2x"
@@ -304,10 +299,9 @@ export default {
           popular: false,
           features: [
             { icon: "fas fa-check", text: "Hasta 2 bases de datos", included: true },
-            { icon: "fas fa-check", text: "Backup semanal", included: true },
-            { icon: "fas fa-check", text: "Panel de administración básico", included: true },
-            { icon: "fas fa-times", text: "Monitoreo en tiempo real", included: false },
-            { icon: "fas fa-times", text: "Escalado automático", included: false },
+    
+            { icon: "fas fa-check", text: "Panel de administración ", included: true },
+       
             { icon: "fas fa-times", text: "Soporte prioritario", included: false }
           ]
         },
@@ -319,11 +313,8 @@ export default {
           popular: true,
           features: [
             { icon: "fas fa-check", text: "Hasta 5 bases de datos", included: true },
-            { icon: "fas fa-check", text: "Backup diario", included: true },
             { icon: "fas fa-check", text: "Monitoreo en tiempo real", included: true },
-            { icon: "fas fa-check", text: "Escalado automático", included: true },
             { icon: "fas fa-times", text: "Soporte prioritario", included: false },
-            { icon: "fas fa-times", text: "Integraciones avanzadas", included: false }
           ]
         },
         {
@@ -334,10 +325,7 @@ export default {
           popular: false,
           features: [
             { icon: "fas fa-check", text: "Hasta 10 bases de datos", included: true },
-            { icon: "fas fa-check", text: "Backup en tiempo real", included: true },
             { icon: "fas fa-check", text: "Monitoreo avanzado y alertas", included: true },
-            { icon: "fas fa-check", text: "Escalado automático", included: true },
-            { icon: "fas fa-check", text: "Integraciones avanzadas", included: true },
             { icon: "fas fa-check", text: "Soporte prioritario 24/7", included: true }
           ]
         }

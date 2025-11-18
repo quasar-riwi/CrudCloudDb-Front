@@ -45,6 +45,13 @@
             <div class="mb-4">
               <label class="form-label text-white">Confirmar Nueva Contraseña</label>
               <input type="password" v-model="confirmPassword" class="form-control bg-transparent text-white border-light" required />
+
+              <!-- 🔥 Indicador en tiempo real -->
+              <p v-if="confirmPassword"
+                 :class="passwordsMatch ? 'text-success' : 'text-danger'"
+                 class="mt-2 fw-bold small">
+                {{ passwordsMatch ? "✔ Las contraseñas coinciden" : "✖ Las contraseñas no coinciden" }}
+              </p>
             </div>
 
             <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold" :disabled="loading">
@@ -71,6 +78,21 @@
       </div>
 
     </div>
+
+    <!-- 🔥 MODAL PERSONALIZADO -->
+    <div v-if="showModal" class="modal-backdrop">
+      <div class="modal-box">
+        <h4 class="modal-title" :class="modalType === 'success' ? 'text-info' : 'text-danger'">
+          {{ modalType === 'success' ? '✔ Éxito' : '⚠ Error' }}
+        </h4>
+        <p class="modal-message">{{ modalMessage }}</p>
+
+        <button class="btn btn-primary w-100 mt-3 rounded-pill fw-bold" @click="showModal = false">
+          Cerrar
+        </button>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -86,20 +108,42 @@ export default {
       newPassword: "",
       confirmPassword: "",
       loading: false,
+
+      // Modal
+      showModal: false,
+      modalMessage: "",
+      modalType: "success",
     };
   },
+
+  computed: {
+    // 🔥 Computado para revisar coincidencia en tiempo real
+    passwordsMatch() {
+      return this.newPassword && this.confirmPassword && this.newPassword === this.confirmPassword;
+    }
+  },
+
   methods: {
-    async updateProfile() {
-      alert("Función para actualizar perfil aún no implementada.");
+    showModalMessage(msg, type = "success") {
+      this.modalMessage = msg;
+      this.modalType = type;
+      this.showModal = true;
     },
+
+    async updateProfile() {
+      this.showModalMessage("Función para actualizar perfil aún no implementada.", "error");
+    },
+
     async changePassword() {
-      if (this.newPassword !== this.confirmPassword) {
-        alert("❌ Las contraseñas no coinciden.");
+      if (!this.passwordsMatch) {
+        this.showModalMessage("Las contraseñas no coinciden.", "error");
         return;
       }
+
       try {
         this.loading = true;
         const token = localStorage.getItem("token");
+
         const response = await axios.post(
           "https://service.quasar.andrescortes.dev/api/Users/change-password",
           {
@@ -114,17 +158,18 @@ export default {
             },
           }
         );
+
         if (response.status === 200 && response.data.success) {
-          alert("✅ Contraseña actualizada correctamente.");
+          this.showModalMessage("Contraseña actualizada correctamente.", "success");
           this.currentPassword = "";
           this.newPassword = "";
           this.confirmPassword = "";
         } else {
-          alert(response.data.message || "❌ Error al cambiar la contraseña.");
+          this.showModalMessage(response.data.message || "Error al cambiar la contraseña.", "error");
         }
       } catch (error) {
         console.error("Error al cambiar la contraseña:", error);
-        alert("❌ Error al cambiar la contraseña. Inténtalo de nuevo.");
+        this.showModalMessage("Error al cambiar la contraseña. Inténtalo de nuevo.", "error");
       } finally {
         this.loading = false;
       }
@@ -134,8 +179,8 @@ export default {
 </script>
 
 <style scoped>
+/* ----------- ESTILOS GENERALES ----------- */
 .settings-page {
-
   min-height: 100vh;
   color: white;
   animation: fadeIn 1s ease-in-out;
@@ -168,6 +213,7 @@ export default {
   background: linear-gradient(90deg, #007bff, #00aaff);
 }
 
+/* ----------- ANIMACIONES ----------- */
 .fade-in {
   opacity: 0;
   transform: translateY(-15px);
@@ -189,24 +235,50 @@ export default {
 }
 
 @keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ----------- MODAL PERSONALIZADO ----------- */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease forwards;
+  z-index: 2000;
+}
+
+.modal-box {
+  background: rgba(15, 15, 20, 0.85);
+  border: 1px solid rgba(0, 170, 255, 0.4);
+  border-radius: 20px;
+  padding: 30px;
+  width: 90%;
+  max-width: 420px;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(0, 170, 255, 0.3);
+  animation: fadeUp 0.4s ease forwards;
+}
+
+.modal-title {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.modal-message {
+  color: #ddd;
+  font-size: 1.1rem;
 }
 </style>

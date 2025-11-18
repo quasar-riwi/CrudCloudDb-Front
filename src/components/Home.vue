@@ -25,7 +25,7 @@
 
       <div v-if="!userDatabases.length" class="text-center">
         <div class="user-db-card p-4">
-          <p class="mb-0 text-muted">No hay actividades recientes para mostrar.</p>
+          <p class="mb-0 text-white">No hay actividades recientes para mostrar.</p>
         </div>
       </div>
 
@@ -73,12 +73,6 @@ export default {
       databases: [],
       stats: [],
       userDatabases: [],
-      engines: [
-        { name: "MySQL", instances: "Cargando...", status: "Activo" },
-        { name: "PostgreSQL", instances: "Cargando...", status: "Activo" },
-        { name: "MongoDB", instances: "Cargando...", status: "Activo" },
-        { name: "SQL Server", instances: "Cargando...", status: "Activo" },
-      ],
     };
   },
 
@@ -125,7 +119,6 @@ export default {
   async mounted() {
     await this.fetchDatabases();
     await this.fetchUserActivities();
-    await this.fetchEngineStatus();
   },
 
   methods: {
@@ -145,7 +138,6 @@ export default {
       }
     },
 
-    // 🔥 **CORREGIDO: filtrado real**
     async fetchUserActivities() {
       try {
         const token = localStorage.getItem("token");
@@ -158,9 +150,8 @@ export default {
 
         const logs = Array.isArray(response.data) ? response.data : [];
 
-        // 🔥 FILTRAR SOLO LAS ACTIVIDADES REALES
         const filtered = logs.filter(log =>
-          log.entidad === "DatabaseInstance" &&   // solo logs válidos
+          log.entidad === "DatabaseInstance" &&
           log.detalle &&
           typeof log.detalle === "string" &&
           log.detalle.trim().length > 0
@@ -183,42 +174,6 @@ export default {
       } catch (error) {
         console.error("Error al obtener actividades del usuario:", error);
       }
-    },
-
-    async fetchEngineStatus() {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-
-        const response = await axios.get(
-          "https://service.quasar.andrescortes.dev/api/Health/instances",
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        this.processEngineStatus(response.data || []);
-      } catch (error) {
-        console.error("Error al obtener el estado de los motores:", error);
-        this.processEngineStatus([]);
-      }
-    },
-
-    processEngineStatus(instances) {
-      const requiredEngines = ["MySQL", "PostgreSQL", "MongoDB", "SQLServer"];
-
-      this.engines = requiredEngines.map(engineName => {
-        const filteredInstances = instances.filter(inst => inst.motor === engineName);
-        const count = filteredInstances.length;
-        const hasOfflineInstance = filteredInstances.some(inst => inst.estado !== 'running');
-        let status = 'Activo';
-
-        if (count > 0 && hasOfflineInstance) status = 'Inestable';
-
-        return {
-          name: engineName.replace('SQLServer', 'SQL Server'),
-          instances: `${count} instancia${count !== 1 ? 's' : ''}`,
-          status: status
-        };
-      });
     },
 
     formatAction(action) {
@@ -253,125 +208,10 @@ export default {
   },
 };
 </script>
+
 <style scoped>
-/* TU CSS ORIGINAL SIN CAMBIO ALGUNO */
+/* TU CSS ORIGINAL COMPLETO SIN CAMBIOS */
 
-.home-dashboard {
-  min-height: 100vh;
-  padding: 3rem 1rem;
-  font-family: "Poppins", sans-serif;
-}
-
-.header h2 {
-  font-size: 2rem;
-  color: #ffffff;
-}
-
-.header p {
-  color: #c7d1e0;
-  font-size: 1.1rem;
-}
-
-.stat-card,
-.engine-card,
-.user-db-card {
-  background: rgba(17, 25, 40, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  color: #fff;
-  transition: 0.3s;
-  box-shadow: 0 0 20px rgba(0, 200, 255, 0.15);
-}
-
-.stat-card:hover,
-.engine-card:hover,
-.user-db-card:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 0 25px rgba(0, 200, 255, 0.25);
-}
-
-.text-gradient {
-  background: linear-gradient(90deg, #00d9ff, #8b5cf6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.subtitle {
-  color: #94a3b8;
-  font-size: 0.95rem;
-}
-
-.user-db-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1.5rem;
-}
-
-.user-db-card {
-  padding: 1.5rem;
-}
-
-.db-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.db-list li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  padding: 0.6rem 1rem;
-  margin-bottom: 0.6rem;
-}
-
-.db-list li:last-child {
-  margin-bottom: 0;
-}
-
-.db-name {
-  font-weight: 500;
-}
-
-.db-engine {
-  color: #8b5cf6;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-.fade-in-up {
-  opacity: 0;
-  transform: translateY(30px);
-  animation: fadeInUp 1s ease forwards;
-}
-
-.fade-in-down {
-  opacity: 0;
-  transform: translateY(-30px);
-  animation: fadeInDown 1s ease forwards;
-}
-
-@keyframes fadeInUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeInDown {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.db-date {
-  font-size: 0.85rem;
-  color: #94a3b8;
-  white-space: nowrap;
-}
 .home-dashboard {
   min-height: 100vh;
   padding: 3rem 1rem;
