@@ -1,5 +1,6 @@
 <template>
   <div class="reset-container">
+    <div class="bg-decor" aria-hidden="true"></div>
     <div class="reset-card">
       <h2 class="title">Restablecer contraseña</h2>
       <p class="subtitle">Ingresa una nueva contraseña para tu cuenta.</p>
@@ -120,8 +121,68 @@ export default {
   justify-content: center;
   align-items: center;
   background: radial-gradient(circle at top, #0a0f1f, #050a18);
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Oswald', sans-serif;
 }
+
+/* Fondo creativo sutil para reset password */
+.reset-container {
+  position: relative;
+  overflow: hidden;
+}
+.reset-container::before,
+.reset-container::after {
+  content: '';
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  filter: blur(64px);
+  opacity: 0.11;
+  z-index: 0;
+}
+.reset-container::before {
+  left: -5%;
+  top: -10%;
+  background: radial-gradient(circle at 30% 30%, rgba(0,215,255,0.85), rgba(108,99,255,0.45));
+  animation: floatSlow 10s ease-in-out infinite;
+}
+.reset-container::after {
+  right: -5%;
+  bottom: -10%;
+  background: radial-gradient(circle at 70% 70%, rgba(255,42,109,0.7), rgba(108,99,255,0.35));
+  animation: floatSlowReverse 12s ease-in-out infinite;
+}
+/* extra decorative layer */
+.bg-decor {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.bg-decor::before {
+  content: '';
+  position: absolute;
+  left: -18%;
+  top: -18%;
+  width: 136%;
+  height: 136%;
+  background: radial-gradient(circle at 18% 28%, rgba(0,217,255,0.1), transparent 14%),
+              radial-gradient(circle at 82% 72%, rgba(108,99,255,0.09), transparent 14%);
+  filter: blur(54px) saturate(120%);
+  animation: slowRotate 36s linear infinite;
+}
+.bg-decor::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 18px 18px;
+  mix-blend-mode: overlay;
+  opacity: 0.66;
+  animation: driftDots 14s linear infinite;
+}
+.reset-card { position: relative; z-index: 1; }
 
 .reset-card {
   background: rgba(17, 25, 40, 0.75);

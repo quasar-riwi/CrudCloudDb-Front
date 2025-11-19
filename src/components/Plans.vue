@@ -112,7 +112,7 @@ export default {
 /* TODO TU CSS ORIGINAL SIN CAMBIOS */
 .plans-page {
   min-height: 100vh;
-  background: linear-gradient(180deg, #0b0e1a 0%, #101223 100%);
+
   display: flex;
   flex-direction: column;
   align-items: center;

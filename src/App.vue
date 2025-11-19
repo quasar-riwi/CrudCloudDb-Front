@@ -11,7 +11,8 @@ export default {
 <style>
 body {
   margin: 0;
-  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* Fuente global de la aplicación */
+  font-family: 'Oswald', sans-serif;
   background-color: #f8f9fa;
 }
 </style>

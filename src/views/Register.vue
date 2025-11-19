@@ -280,7 +280,7 @@ export default {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 0 0 10px rgba(0, 247, 255, 0.5);
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Oswald', sans-serif;
   font-weight: 700;
 }
 
@@ -291,7 +291,7 @@ export default {
   background: linear-gradient(90deg, var(--primary), var(--secondary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Oswald', sans-serif;
 }
 
 .btn-futuristic {
@@ -407,14 +407,14 @@ export default {
 }
 
 body {
-  font-family: 'Exo 2', sans-serif;
+  font-family: 'Oswald', sans-serif;
   background-color: var(--darker-bg);
   color: var(--text-light);
   overflow-x: hidden;
 }
 
 h1, h2, h3, h4, h5, .navbar-brand {
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Oswald', sans-serif;
   font-weight: 700;
 }
 

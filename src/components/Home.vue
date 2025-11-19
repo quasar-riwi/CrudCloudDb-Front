@@ -221,7 +221,7 @@ export default {
 .home-dashboard {
   min-height: 100vh;
   padding: 3rem 1rem;
-  font-family: "Poppins", sans-serif;
+  font-family: 'Oswald', sans-serif;
 }
 
 .header h2 {

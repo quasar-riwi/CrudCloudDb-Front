@@ -58,7 +58,7 @@
           CrudCloud automatiza la complejidad de las bases de datos para que puedas enfocarte en construir aplicaciones increíbles, no en administrar infraestructura. Escalabilidad, seguridad y rendimiento en una sola plataforma.
         </p>
         <div class="d-flex flex-column flex-md-row justify-content-center gap-3 hero-buttons">
-          <button class="btn btn-futuristic btn-lg pulse" @click="goToRegister">
+          <button  class="btn btn-futuristic btn-lg pulse" @click="goToRegister">
             <i class="fas fa-rocket me-2"></i>Empezar Gratis
           </button>
           <a href="#funciona" class="btn btn-outline-futuristic btn-lg">
@@ -427,8 +427,7 @@ export default {
 </script>
 
 <style>
-/* Importar fuentes */
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;500;600&display=swap');
+/* Las fuentes ahora se cargan globalmente desde index.html */
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
 @import url('https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css');
 
@@ -450,7 +449,7 @@ export default {
 }
 
 body {
-  font-family: 'Exo 2', sans-serif;
+  font-family: 'Oswald', sans-serif;
   background-color: var(--darker-bg);
   color: var(--text-light);
   overflow-x: hidden;
@@ -461,7 +460,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, .navbar-brand {
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Oswald', sans-serif;
   font-weight: 700;
 }
 
@@ -727,7 +726,7 @@ h1, h2, h3, h4, h5, .navbar-brand {
   color: var(--primary);
   text-shadow: 0 0 15px rgba(0, 247, 255, 0.5);
   margin-bottom: 1rem;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Oswald', sans-serif;
 }
 
 /* Tecnologías */
@@ -811,7 +810,7 @@ h1, h2, h3, h4, h5, .navbar-brand {
   font-weight: 700;
   margin-bottom: 1.5rem;
   color: var(--text-light);
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Oswald', sans-serif;
 }
 
 .plan-features {
@@ -941,7 +940,7 @@ h1, h2, h3, h4, h5, .navbar-brand {
   font-size: 3rem;
   font-weight: 700;
   color: var(--primary);
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Oswald', sans-serif;
 }
 
 .stat-label {

@@ -1,5 +1,6 @@
 <template>
   <div class="verify-container">
+    <div class="bg-decor" aria-hidden="true"></div>
     <div class="verify-card">
 
       <!-- Estado de carga -->
@@ -78,8 +79,80 @@ export default {
   justify-content: center;
   align-items: center;
   background: radial-gradient(circle at top, #0a0f1f, #050a18);
-  font-family: "Poppins", sans-serif;
+  font-family: 'Oswald', sans-serif;
   color: #fff;
+}
+
+/* Fondo creativo sutil para verify */
+.verify-container {
+  position: relative;
+  overflow: hidden;
+}
+.verify-container::before,
+.verify-container::after {
+  content: '';
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.12;
+  z-index: 0;
+}
+.verify-container::before {
+  left: -6%;
+  top: -8%;
+  background: radial-gradient(circle at 30% 30%, rgba(0,217,255,0.85), rgba(108,99,255,0.5));
+  animation: floatSlow 11s ease-in-out infinite;
+}
+.verify-container::after {
+  right: -6%;
+  bottom: -8%;
+  background: radial-gradient(circle at 70% 70%, rgba(255,42,109,0.75), rgba(108,99,255,0.35));
+  animation: floatSlowReverse 13s ease-in-out infinite;
+}
+.verify-card { position: relative; z-index: 1; }
+
+@keyframes floatSlow {
+  0% { transform: translateY(0) translateX(0) scale(1); }
+  50% { transform: translateY(-24px) translateX(8px) scale(1.04); }
+  100% { transform: translateY(0) translateX(0) scale(1); }
+}
+@keyframes floatSlowReverse {
+  0% { transform: translateY(0) translateX(0) scale(1); }
+  50% { transform: translateY(24px) translateX(-8px) scale(1.03); }
+  100% { transform: translateY(0) translateX(0) scale(1); }
+}
+
+/* extra decorative layer */
+.bg-decor {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.bg-decor::before {
+  content: '';
+  position: absolute;
+  left: -18%;
+  top: -18%;
+  width: 136%;
+  height: 136%;
+  background: radial-gradient(circle at 18% 28%, rgba(0,217,255,0.1), transparent 14%),
+              radial-gradient(circle at 82% 72%, rgba(108,99,255,0.09), transparent 14%);
+  filter: blur(54px) saturate(120%);
+  animation: slowRotate 38s linear infinite;
+}
+.bg-decor::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 18px 18px;
+  mix-blend-mode: overlay;
+  opacity: 0.7;
+  animation: driftDots 16s linear infinite;
 }
 
 /* === Tarjeta principal === */

@@ -1,5 +1,6 @@
 <template>
   <div class="dashboard text-white">
+    <div class="bg-decor" aria-hidden="true"></div>
     <!-- BOTÓN HAMBURGER -->
     <button class="toggle-btn" @click="toggleSidebar">☰</button>
 
@@ -19,7 +20,7 @@
         <button class="txtSize" @click="$router.push('/dashboard/Settings')">⚙️ Configuración</button>
       </nav>
 
-      <!-- SECCIÓN DE USUARIO (HTML SIN CAMBIOS) -->
+      <!-- SECCIÓN DE USUARIO -->
       <div class="user-section fade-up">
         <div class="user-icon">
           <img v-if="avatarUrl" :src="avatarUrl" alt="Avatar de usuario" class="user-avatar" />
@@ -34,6 +35,10 @@
     </aside>
 
     <main class="content" :class="{ expanded: isCollapsed }">
+
+      <!-- ⭐ NUEVA CAPA ANIMADA DEL FONDO DEL CONTENIDO ⭐ -->
+      <div class="component-bg-decor"></div>
+
       <section class="main-content fade-up">
         <router-view :user="user" />
       </section>
@@ -123,10 +128,92 @@ export default {
   height: 100vh;
   overflow: hidden;
   background: radial-gradient(ellipse at center, #111122 0%, #0a0a17 100%);
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Oswald', sans-serif;
 }
 
-/* === SIDEBAR === */
+/* Fondo creativo sutil (blobs y patrón de puntos) */
+.dashboard {
+  position: relative;
+}
+.dashboard::before,
+.dashboard::after {
+  content: '';
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.14;
+  z-index: 0;
+  pointer-events: none;
+}
+.dashboard::before {
+  left: -8%;
+  top: -12%;
+  background: radial-gradient(circle at 30% 30%, rgba(0,215,255,0.9), rgba(108,99,255,0.6));
+  animation: floatSlow 12s ease-in-out infinite;
+}
+.dashboard::after {
+  right: -8%;
+  bottom: -12%;
+  background: radial-gradient(circle at 70% 70%, rgba(108,99,255,0.9), rgba(255,42,109,0.4));
+  animation: floatSlowReverse 14s ease-in-out infinite;
+}
+.dashboard .content {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.dashboard {
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(0,0,0,0.02) 1px, transparent 1px),
+    radial-gradient(circle at 80% 80%, rgba(255,255,255,0.02) 1px, transparent 1px),
+    radial-gradient(ellipse at center, #111122 0%, #0a0a17 100%);
+  background-size: 18px 18px, 18px 18px, cover;
+}
+
+/* ============================================================
+ ** ⭐ NUEVO FONDO ANIMADO PARA EL ÁREA DE COMPONENTES ⭐
+============================================================ */
+.component-bg-decor {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  background:
+    /* cuadrícula */
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px),
+
+    /* figuras geométricas difusas */
+    radial-gradient(circle 180px at 20% 30%, rgba(0,217,255,0.12), transparent),
+    radial-gradient(circle 200px at 80% 70%, rgba(255,42,145,0.10), transparent);
+
+  background-size:
+    40px 40px,
+    40px 40px,
+    cover,
+    cover;
+
+  animation: gridMove 25s linear infinite, floatGeo 18s ease-in-out infinite;
+}
+
+@keyframes gridMove {
+  0% { background-position: 0 0, 0 0, 0 0, 0 0; }
+  100% { background-position: 200px 120px, 120px 200px, 0 0, 0 0; }
+}
+
+@keyframes floatGeo {
+  0% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.03) translateY(-15px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+/* ============================================================ */
+
+
 .sidebar {
   width: 270px;
   background: linear-gradient(180deg, #191933 0%, #0f0f1f 100%);
@@ -180,14 +267,10 @@ export default {
   transform: translateX(5px);
 }
 
-/* === ESTILOS MODIFICADOS PARA EL AVATAR VERTICAL === */
 .user-section {
   display: flex;
-  /* MODIFICADO: Cambiado a 'column' para apilar verticalmente */
   flex-direction: column;
-  /* MODIFICADO: Ahora centra los elementos horizontalmente */
   align-items: center;
-  /* Ajusta el espacio vertical entre el avatar y la info */
   gap: 10px;
   padding: 20px;
   border-top: 1px solid rgba(77, 124, 138, 0.2);
@@ -195,7 +278,7 @@ export default {
 }
 
 .user-icon {
-  min-width: 60px; /* Un poco más grande para destacar */
+  min-width: 60px;
   width: 60px;
   height: 60px;
   border-radius: 50%;
@@ -205,7 +288,7 @@ export default {
   justify-content: center;
   overflow: hidden;
   border: 2px solid rgba(77, 124, 138, 0.3);
-  font-size: 2rem; /* Aumenta el tamaño del emoji de fallback */
+  font-size: 2rem;
 }
 
 .user-avatar {
@@ -218,7 +301,6 @@ export default {
   width: 100%;
   font-size: 0.9rem;
   margin-top: 5px;
-  /* NUEVO: Centra el texto (nombre, plan) y el botón */
   text-align: center;
 }
 
@@ -234,8 +316,6 @@ export default {
   font-size: 0.85rem;
 }
 
-
-/* === CONTENIDO (sin cambios) === */
 .content {
   flex: 1;
   background-color: #0e0e1c;
@@ -252,10 +332,11 @@ export default {
   padding: 40px;
   color: white;
   min-height: 100vh;
+  position: relative;
+  z-index: 1;
   animation: fadeUp 1s ease forwards;
 }
 
-/* === BOTÓN HAMBURGER (sin cambios) === */
 .toggle-btn {
   display: none;
   position: fixed;
@@ -276,7 +357,6 @@ export default {
   background: rgba(77, 124, 138, 0.4);
 }
 
-/* === ANIMACIONES (sin cambios) === */
 .fade-up {
   opacity: 0;
   transform: translateY(25px);
@@ -303,7 +383,7 @@ export default {
   }
 }
 
-/* === RESPONSIVE (sin cambios) === */
+/* === RESPONSIVE === */
 @media (max-width: 992px) {
   .toggle-btn {
     display: block;

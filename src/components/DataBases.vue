@@ -283,11 +283,11 @@ export default {
 </script>
 <style scoped>
 .databases-view {
-  background: linear-gradient(180deg, #0b0e1a 0%, #101223 100%);
+
   min-height: 100vh;
   padding: 2rem;
   color: #f2f6ff;
-  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-family: 'Oswald', sans-serif;
   display: flex;
   flex-direction: column;
   gap: 2rem;
