@@ -70,6 +70,28 @@
               Tu plan actual es:
               <span class="fw-bold text-info">{{ user.plan || "Desconocido" }}</span>
             </p>
+              <!-- Barras de progreso por motor -->
+              <div class="mt-3">
+                <h6 class="mb-2">Uso de instancias por motor</h6>
+                <div v-for="engine in engines" :key="engine" class="mb-3">
+                  <div class="engine-header d-flex justify-content-between align-items-baseline mb-1">
+                    <div class="engine-name">{{ engine }}</div>
+                    <div class="engine-count fw-bold small">{{ engineCounts[engine]?.count || 0 }} / {{ userLimit }}</div>
+                  </div>
+
+                  <div class="progress engine-progress" aria-hidden="true">
+                    <div
+                      class="progress-bar"
+                      role="progressbar"
+                      :style="{ width: Math.min(100, Math.round(((engineCounts[engine]?.count||0) / userLimit) * 100)) + '%' }"
+                      :aria-valuenow="engineCounts[engine]?.count || 0"
+                      :aria-valuemin="0"
+                      :aria-valuemax="userLimit"
+                    ></div>
+                  </div>
+                </div>
+                <p class="small text-muted mt-2">Actualizado: {{ lastUpdated ? new Date(lastUpdated).toLocaleTimeString() : '—' }}</p>
+              </div>
           </div>
           <button class="btn btn-outline-info w-100 rounded-pill fw-bold mt-3" @click="$router.push('/dashboard/plans')">
             Cambiar Plan
@@ -113,10 +135,26 @@ export default {
       showModal: false,
       modalMessage: "",
       modalType: "success",
+      // Engines / usage
+      engines: ["PostgreSQL", "MySQL", "MongoDB", "SQLServer"],
+      engineCounts: {},
+      countsIntervalId: null,
+      lastUpdated: null,
+      dbApiUrl: "https://service.quasar.andrescortes.dev/api/DatabaseInstances",
     };
   },
 
   computed: {
+    userLimit() {
+      if (!this.user || !this.user.plan) return 2;
+
+      switch (this.user.plan.toLowerCase()) {
+        case "gratis": return 2;
+        case "intermedio": return 5;
+        case "avanzado": return 10;
+        default: return 2;
+      }
+    },
     // 🔥 Computado para revisar coincidencia en tiempo real
     passwordsMatch() {
       return this.newPassword && this.confirmPassword && this.newPassword === this.confirmPassword;
@@ -174,6 +212,60 @@ export default {
         this.loading = false;
       }
     },
+
+    // Fetch counts of DB instances and compute per-engine counts
+    async fetchInstanceCounts() {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          // reset counts to zero
+          this.engineCounts = this.engines.reduce((acc, e) => { acc[e] = { count: 0 }; return acc; }, {});
+          return;
+        }
+
+        const response = await axios.get(this.dbApiUrl, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const counts = {};
+        this.engines.forEach((e) => { counts[e] = { count: 0 }; });
+
+        (response.data || []).forEach((db) => {
+          const engineName = db.motor || db.engine || db.Motor || db.engineName;
+          // Normalize a few common names
+          if (!engineName) return;
+          let key = engineName;
+          if (/postgre/i.test(engineName)) key = "PostgreSQL";
+          else if (/mysql/i.test(engineName)) key = "MySQL";
+          else if (/mongo/i.test(engineName)) key = "MongoDB";
+          else if (/sqlserver/i.test(engineName) || /sql server/i.test(engineName)) key = "SQLServer";
+
+          if (!counts[key]) counts[key] = { count: 0 };
+          counts[key].count++;
+        });
+
+        // Ensure every engine has a count
+        this.engines.forEach((e) => { if (!counts[e]) counts[e] = { count: 0 }; });
+
+        this.engineCounts = counts;
+        this.lastUpdated = Date.now();
+      } catch (error) {
+        // On error, keep previous counts but log
+        console.error("Error fetching instance counts:", error);
+      }
+    },
+  },
+
+  async mounted() {
+    // Start polling for counts (every 5s)
+    await this.fetchInstanceCounts();
+    this.countsIntervalId = setInterval(() => {
+      this.fetchInstanceCounts();
+    }, 5000);
+  },
+
+  beforeUnmount() {
+    if (this.countsIntervalId) clearInterval(this.countsIntervalId);
   },
 };
 </script>
@@ -280,5 +372,34 @@ export default {
 .modal-message {
   color: #ddd;
   font-size: 1.1rem;
+}
+
+/* Engine label and progress tweaks */
+.engine-header .engine-name {
+  font-size: 0.95rem;
+  color: #b6bde0;
+  font-weight: 600;
+}
+.engine-header .engine-count {
+  color: #e6f7ff;
+}
+.engine-progress {
+  height: 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  overflow: hidden;
+}
+.engine-progress .progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(0,217,255,0.95), rgba(0,255,174,0.9));
+  transition: width 600ms cubic-bezier(.2,.9,.2,1);
+  box-shadow: inset 0 -2px 8px rgba(0,0,0,0.25);
+}
+.engine-name { margin-bottom: 6px; }
+.engine-count { min-width: 56px; text-align: right; }
+
+@media (max-width: 576px) {
+  .engine-header { flex-direction: row; gap: 8px; }
+  .engine-name { font-size: 0.9rem; }
 }
 </style>
