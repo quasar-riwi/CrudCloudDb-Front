@@ -98,7 +98,7 @@
     <section id="funciona" class="py-5 align-center futuristic-bg">
       <div class="container">
         <h2 class="section-title">¿Cómo funciona CrudCloud?</h2>
-        <p class="section-subtitle">En solo dos simples pasos, tendrás tu base de datos lista para producción.</p>
+        <p class="section-subtitle">En solo tres simples pasos, tendrás tu base de datos lista para producción.</p>
 
         <div class="row g-4">
           <div class="col-md-6 col-lg-3" v-for="(step, index) in steps" :key="index">
@@ -114,9 +114,27 @@
         </div>
 
         <div class="text-center mt-5">
-          <button class="btn btn-futuristic btn-lg">
-            <i class="fas fa-play-circle me-2"></i>Ver Video Explicativo
+          <button class="btn btn-futuristic btn-lg" @click="toggleVideo" :aria-expanded="showVideo">
+            <i class="fas fa-play-circle me-2"></i>{{ showVideo ? 'Ocultar Video' : 'Ver Video Explicativo' }}
           </button>
+        </div>
+
+        <!-- Video embebido (aparece sólo cuando showVideo === true) -->
+        <div class="container video-wrapper mt-4" v-if="showVideo">
+          <div class="video-container mx-auto">
+            <!-- Usamos la clase .ratio de Bootstrap para mantener 16:9 responsive -->
+            <div class="ratio ratio-16x9">
+              <iframe
+                :src="youtubeEmbedUrl"
+                title="Video explicativo CrudCloud"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+            </div>
+
+           
+          </div>
         </div>
       </div>
     </section>
@@ -128,10 +146,10 @@
     <p class="section-subtitle">Ofrecemos soporte para los motores de bases de datos más populares del mercado.</p>
 
     <div class="row g-4 justify-content-center">
-      <div class="col-6 col-md-4 col-lg-2"
-           v-for="(tech, index) in technologies"
+      <div class="col-6 col-md-4 col-lg-2" 
+           v-for="(tech, index) in technologies" 
            :key="index">
-
+           
         <div class="database-card text-center p-3 shadow-sm rounded-3"
              style="background: rgba(255, 255, 255, 0.06);
                     backdrop-filter: blur(6px);
@@ -240,6 +258,11 @@
 </template>
 
 <script>
+import postgreImg from '../assets/postgre.png';
+import mysqlImg from '../assets/mysql.png';
+import sqlserveImg from '../assets/sqlserve.png';
+import mongodbImg from '../assets/mongodb.png';
+
 export default {
   name: "WelcomePage",
   data() {
@@ -252,7 +275,7 @@ export default {
           description: "Crea instancias de bases de datos en segundos con nuestra interfaz intuitiva o API. Configuración automatizada sin complicaciones.",
           items: ["Implementación en menos de 60 segundos", "Interfaz intuitiva ", "Configuración automatizada"]
         },
-
+      
         {
           icon: "fas fa-shield-alt",
           title: "Seguridad Integrada",
@@ -265,9 +288,9 @@ export default {
           description: "Cada accion va ser notificada en tu dispositivo movil",
           items: [ "Monitoreo 24/7"]
         },
-
+      
       ],
-
+     
       steps: [
         {
           number: "01",
@@ -275,20 +298,25 @@ export default {
           description: "Selecciona entre una variedad de bases de datos SQL y NoSQL populares: PostgreSQL, MySQL, MongoDB y más.",
           icon: "fas fa-database fa-2x"
         },
-
-
         {
           number: "02",
+          title: "Configura tu plan",
+          description: "Define los recursos como CPU, RAM y almacenamiento que tu app necesita. Escoge entre planes predefinidos o personalizados.",
+          icon: "fas fa-sliders-h fa-2x"
+        },
+        
+        {
+          number: "03",
           title: "Conecta tu app",
           description: "Usa la cadena de conexión proporcionada y listo en minutos. Documentación completa y ejemplos de código incluidos.",
           icon: "fas fa-plug fa-2x"
         }
       ],
       technologies: [
-        { image: "/src/assets/postgre.png", name: "PostgreSQL" },
-        { image: "/src/assets/mysql.png", name: "MySQL" },
-        { image: "/src/assets/sqlserve.png", name: "SQL Server" },
-        { image: "/src/assets/mongodb.png", name: "MongoDB" },
+        { image: postgreImg, name: "PostgreSQL" },
+        { image: mysqlImg, name: "MySQL" },
+        { image: sqlserveImg, name: "SQL Server" },
+        { image: mongodbImg, name: "MongoDB" },
       ],
       plans: [
         {
@@ -299,9 +327,10 @@ export default {
           popular: false,
           features: [
             { icon: "fas fa-check", text: "Hasta 2 bases de datos", included: true },
-
-            { icon: "fas fa-check", text: "Panel de administración ", included: true },
-
+            { icon: "fas fa-check", text: "Backup semanal", included: true },
+            { icon: "fas fa-check", text: "Panel de administración básico", included: true },
+            { icon: "fas fa-times", text: "Monitoreo en tiempo real", included: false },
+            { icon: "fas fa-times", text: "Escalado automático", included: false },
             { icon: "fas fa-times", text: "Soporte prioritario", included: false }
           ]
         },
@@ -313,8 +342,11 @@ export default {
           popular: true,
           features: [
             { icon: "fas fa-check", text: "Hasta 5 bases de datos", included: true },
+            { icon: "fas fa-check", text: "Backup diario", included: true },
             { icon: "fas fa-check", text: "Monitoreo en tiempo real", included: true },
+            { icon: "fas fa-check", text: "Escalado automático", included: true },
             { icon: "fas fa-times", text: "Soporte prioritario", included: false },
+            { icon: "fas fa-times", text: "Integraciones avanzadas", included: false }
           ]
         },
         {
@@ -325,7 +357,10 @@ export default {
           popular: false,
           features: [
             { icon: "fas fa-check", text: "Hasta 10 bases de datos", included: true },
+            { icon: "fas fa-check", text: "Backup en tiempo real", included: true },
             { icon: "fas fa-check", text: "Monitoreo avanzado y alertas", included: true },
+            { icon: "fas fa-check", text: "Escalado automático", included: true },
+            { icon: "fas fa-check", text: "Integraciones avanzadas", included: true },
             { icon: "fas fa-check", text: "Soporte prioritario 24/7", included: true }
           ]
         }
@@ -347,8 +382,18 @@ export default {
           title: "Legal",
           links: ["Privacidad", "Términos", "Seguridad", "Cookies"]
         }
-      ]
+      ],
+      // estado para mostrar/ocultar el video
+      showVideo: false,
+      // id por defecto del video de YouTube (puedes cambiarlo)
+      youtubeVideoId: 'gkS-jIcXM3Q'
     };
+  },
+  computed: {
+    youtubeEmbedUrl() {
+      // autoplay cuando se muestre; rel=0 para no mostrar otros videos al final
+      return `https://www.youtube.com/embed/${this.youtubeVideoId}?autoplay=1&rel=0`;
+    }
   },
   methods: {
     goToLogin() {
@@ -359,6 +404,17 @@ export default {
     },
     handleScroll() {
       this.isScrolled = window.scrollY > 50;
+    }
+    ,
+    toggleVideo() {
+      this.showVideo = !this.showVideo;
+      // cuando se abra, hacemos scroll suave al video para enfocarlo
+      if (this.showVideo) {
+        this.$nextTick(() => {
+          const el = document.querySelector('.video-wrapper');
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      }
     }
   },
   mounted() {
@@ -861,6 +917,16 @@ h1, h2, h3, h4, h5, .navbar-brand {
     box-shadow: 0 0 0 0 rgba(0, 247, 255, 0);
   }
 }
+
+/* Video embebido (estilos) */
+.video-wrapper {
+  max-width: 980px;
+}
+.video-container {
+  width: 100%;
+  padding: 0 1rem;
+}
+
 
 /* Estadísticas */
 .stats-section {
