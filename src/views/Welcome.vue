@@ -98,7 +98,7 @@
     <section id="funciona" class="py-5 align-center futuristic-bg">
       <div class="container">
         <h2 class="section-title">¿Cómo funciona CrudCloud?</h2>
-        <p class="section-subtitle">En solo tres simples pasos, tendrás tu base de datos lista para producción.</p>
+        <p class="section-subtitle">En solo dos simples pasos, tendrás tu base de datos lista para producción.</p>
 
         <div class="row g-4">
           <div class="col-md-6 col-lg-3" v-for="(step, index) in steps" :key="index">
@@ -128,10 +128,10 @@
     <p class="section-subtitle">Ofrecemos soporte para los motores de bases de datos más populares del mercado.</p>
 
     <div class="row g-4 justify-content-center">
-      <div class="col-6 col-md-4 col-lg-2" 
-           v-for="(tech, index) in technologies" 
+      <div class="col-6 col-md-4 col-lg-2"
+           v-for="(tech, index) in technologies"
            :key="index">
-           
+
         <div class="database-card text-center p-3 shadow-sm rounded-3"
              style="background: rgba(255, 255, 255, 0.06);
                     backdrop-filter: blur(6px);
@@ -252,7 +252,7 @@ export default {
           description: "Crea instancias de bases de datos en segundos con nuestra interfaz intuitiva o API. Configuración automatizada sin complicaciones.",
           items: ["Implementación en menos de 60 segundos", "Interfaz intuitiva ", "Configuración automatizada"]
         },
-      
+
         {
           icon: "fas fa-shield-alt",
           title: "Seguridad Integrada",
@@ -265,9 +265,9 @@ export default {
           description: "Cada accion va ser notificada en tu dispositivo movil",
           items: [ "Monitoreo 24/7"]
         },
-      
+
       ],
-     
+
       steps: [
         {
           number: "01",
@@ -275,8 +275,8 @@ export default {
           description: "Selecciona entre una variedad de bases de datos SQL y NoSQL populares: PostgreSQL, MySQL, MongoDB y más.",
           icon: "fas fa-database fa-2x"
         },
-       
-        
+
+
         {
           number: "02",
           title: "Conecta tu app",
@@ -299,9 +299,9 @@ export default {
           popular: false,
           features: [
             { icon: "fas fa-check", text: "Hasta 2 bases de datos", included: true },
-    
+
             { icon: "fas fa-check", text: "Panel de administración ", included: true },
-       
+
             { icon: "fas fa-times", text: "Soporte prioritario", included: false }
           ]
         },
