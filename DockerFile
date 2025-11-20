@@ -1,0 +1,33 @@
+# -------------------------------
+# Etapa 1: Construcción del proyecto Vue
+# -------------------------------
+FROM node:20-alpine AS build
+
+# Crear directorio de trabajo
+WORKDIR /app
+
+# Copiar archivos de configuración
+COPY package*.json ./
+
+# Instalar dependencias
+RUN npm install
+
+# Copiar el resto del código
+COPY . .
+
+# Compilar el proyecto para producción
+RUN npm run build
+
+# -------------------------------
+# Etapa 2: Servidor Nginx
+# -------------------------------
+FROM nginx:alpine
+
+# Copiar los archivos generados al contenedor de Nginx
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Exponer el puerto
+EXPOSE 80
+
+# Iniciar Nginx
+CMD ["nginx", "-g", "daemon off;"]
